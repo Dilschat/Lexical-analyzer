@@ -3,16 +3,19 @@
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 public class Tokenizer {
 
     private DataInputStream sourceCode;
+
     //TODO map all lists to hashtable for perfomance improving
     private static List<String> keywords = Arrays.asList("case", "catch", "class",
             "def", "do", "else", "extends", "false", "final", "for", "if",
             "match", "new", "null", "print", "printf", "println", "throw",
             "to", "trait", "true", "try", "until", "val", "var", "while", "with");
+    private static HashSet<String> keywordsSet = new HashSet<String>(keywords);
     private static String indentifyierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
     private static String delimiterPattern = "[;|,|.]"; // а как же {} ()
     //TODO add synatic noise
@@ -22,6 +25,7 @@ public class Tokenizer {
                     "||", "&&", "&", "|", "~", "^", ">>>",
                     "<<", ">>", "=", "+=", "-=", "*=", "/=",
                     "%=", "<<=", ">>=", "^=", "|=", "&=");
+    private static HashSet<String> operatorsSet = new HashSet<String>(operators);
     private static List<String> literalPattern = Arrays.asList("\"[[\\s|\\S]*\"]"/*string pattern*/,
             "[0-9]*"/*number pattern*/, "[0-9]*.[0-9]*[[e][-|+][[0-9]*[d]?]]?", "\"\"\"[[\\s|\\S|\n]*]\"\"\"");
 
@@ -49,113 +53,13 @@ public class Tokenizer {
     }
 
     /**
-     * all operators in scala
-     * + - * / %
-     * == != > < >= <=
-     * && || !
-     * & | ^
-     * ~ << >> >>>
-     * = += -= *= /= %= <<= >>= &= ^= |=
-     *
-     *
-     * assume this functions is called only when current character is an beginning of the operator
+     * ( ) [ ] { }
+     * ` ' " . ; ,
+     * @param character
      * @return
-     * @throws Exception
      */
-    private Token processOperator() throws Exception {
-        if("=!+-*/%&^|".contains(currentChar.toString())){ // simple operations without  < >
-            previousCharacters = currentChar.toString();
-            readNextChar();
-            if (currentChar.equals('=')){ // с присвоением ну или ==
-                previousCharacters = previousCharacters + currentChar.toString();
-                readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
-            } else{ // без присвоения
-                readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
-            }
-        }
-
-
-        else if("<".contains(currentChar.toString())){ // processing < <= <<= <<
-            previousCharacters = currentChar.toString();
-            readNextChar();
-            if (currentChar.equals('=')){ // <=
-                previousCharacters = previousCharacters + currentChar.toString();
-                readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
-            } else if(currentChar.equals('<')){ // <<= or <<
-                previousCharacters = previousCharacters + currentChar.toString();
-                readNextChar();
-                if (currentChar.equals('=')){ // <<=
-                    previousCharacters = previousCharacters + currentChar.toString();
-                    readNextChar();
-                    readCharsTillValuableChar();
-                    return new Token(previousCharacters, Token.OPERATOR);
-                } else { // <<
-                    readCharsTillValuableChar();
-                    return new Token(previousCharacters, Token.OPERATOR);
-                }
-            } else { // <
-                readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
-            }
-        }
-
-        else if(">".contains(currentChar.toString())){ // processing > >= >> >>= >>>
-            previousCharacters = currentChar.toString();
-            readNextChar();
-            if (currentChar.equals('=')){ // >=
-                previousCharacters = previousCharacters + currentChar.toString();
-                readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
-            } else if(currentChar.equals('>')){// >> >>> >>=
-                previousCharacters = previousCharacters + currentChar.toString();
-                readNextChar();
-                if(currentChar.equals('>')){ // >>>
-                    previousCharacters = previousCharacters + currentChar.toString();
-                    readNextChar();
-                    readCharsTillValuableChar();
-                    return new Token(previousCharacters, Token.OPERATOR);
-                }else if(currentChar.equals('=')) { // >>=
-                    previousCharacters = previousCharacters + currentChar.toString();
-                    readNextChar();
-                    readCharsTillValuableChar();
-                    return new Token(previousCharacters, Token.OPERATOR);
-                } else { // >>
-                    readCharsTillValuableChar();
-                    return new Token(previousCharacters, Token.OPERATOR);
-                }
-            } else { // >
-                readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
-            }
-        }
-
-        else if(currentChar.equals('~')){ // processing ~
-            readNextChar();
-            readCharsTillValuableChar();
-            return new Token(previousCharacters, Token.OPERATOR);
-        }
-
-        else{
-            throw new Exception("kakayoto hyinya");
-        }
-    }
-
-    /**
-     * reads characters while current character is not whitespace
-     */
-    private void readCharsTillValuableChar(){
-        while(currentChar.equals(" ")){
-            readNextChar();
-        }
+    private boolean isDelimiter(Character character) {
+        return "()[]{}`.,".contains(character.toString()); //TODO check if delimiter
     }
 
     /**
@@ -175,13 +79,37 @@ public class Tokenizer {
     }
 
     /**
-     * ( ) [ ] { }
-     * ` ' " . ; ,
-     * @param character
+     * all operators in scala
+     * + - * / %
+     * == != > < >= <=
+     * && || !
+     * & | ^
+     * ~ << >> >>>
+     * = += -= *= /= %= <<= >>= &= ^= |=
+     *
+     *
+     * assume this functions is called only when current character is an beginning of the operator
      * @return
+     * @throws Exception
      */
-    private boolean isDelimiter(Character character) {
-        return "()[]{}`.,".contains(character.toString()); //TODO check if delimiter
+    private Token processOperator(){
+        while(operatorsSet.contains(previousCharacters + currentChar.toString())){
+            previousCharacters = previousCharacters + currentChar;
+            readNextChar();
+        }
+        readNextChar();
+        readCharsTillValuableChar();
+        return new Token(previousCharacters, Token.OPERATOR);
+    }
+
+
+    /**
+     * reads characters while current character is not whitespace
+     */
+    private void readCharsTillValuableChar(){
+        while(currentChar.equals(" ")){
+            readNextChar();
+        }
     }
 
     /**
