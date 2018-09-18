@@ -58,7 +58,7 @@ public class Tokenizer {
      * = += -= *= /= %= <<= >>= &= ^= |=
      *
      *
-     * assume this functions is called only when current character is an beggining of the operator
+     * assume this functions is called only when current character is an beginning of the operator
      * @return
      * @throws Exception
      */
@@ -66,7 +66,7 @@ public class Tokenizer {
         if("=!+-*/%&^|".contains(currentChar.toString())){ // simple operations without  < >
             previousCharacters = currentChar.toString();
             readNextChar();
-            if (currentChar.equals('=')){ // с присвоением
+            if (currentChar.equals('=')){ // с присвоением ну или ==
                 previousCharacters = previousCharacters + currentChar.toString();
                 readNextChar();
                 readCharsTillValuableChar();
@@ -149,6 +149,9 @@ public class Tokenizer {
         }
     }
 
+    /**
+     * reads characters while current character is not whitespace
+     */
     private void readCharsTillValuableChar(){
         while(currentChar.equals(" ")){
             readNextChar();
@@ -174,11 +177,11 @@ public class Tokenizer {
     /**
      * ( ) [ ] { }
      * ` ' " . ; ,
-     * @param currentCHar
+     * @param character
      * @return
      */
-    private boolean isDelimiter(Character currentCHar) {
-        return false; //TODO check if delimiter
+    private boolean isDelimiter(Character character) {
+        return "()[]{}`.,".contains(character.toString()); //TODO check if delimiter
     }
 
     /**
@@ -193,6 +196,7 @@ public class Tokenizer {
     }
 
 
+    //TODO: DECOMMENT and do them
     /*
     boolean isThisStartOfLiteral(Character character) {
 
