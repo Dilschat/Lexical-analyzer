@@ -1,14 +1,17 @@
 //import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
 
 import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 
 public class Tokenizer {
 
-    private DataInputStream sourceCode;
+    private Scanner sourceCode;
 
     //TODO map all lists to hashtable for perfomance improving
     private static List<String> keywords = Arrays.asList("case", "catch", "class",
@@ -32,23 +35,26 @@ public class Tokenizer {
     private Character currentChar;
     private String previousCharacters;
 
-    public Tokenizer(DataInputStream dataInputStream){
-        sourceCode = dataInputStream;
+    public Tokenizer(Scanner scanner){
+        sourceCode = scanner;
+        scanner.useDelimiter("");
         readNextChar();
     }
 
+    public boolean hasNext(){
+        return currentChar != null;
+    }
 
     //Draft impl. TODO finish according patterns above.
     public Token getNextToken() throws Exception {
         previousCharacters = "";
         if (isDelimiter(currentChar)){
-            readNextChar();
-            readCharsTillValuableChar();
-            return new Token(currentChar, Token.DELIMITER);
+            return processDelimiter();
         } else if(isThisStartOfOperatorOrSyntaxNoise(currentChar)){
             return processOperator();
         } else {
-            return new Token("ne to", "ne to");
+            readNextChar();
+            return new Token(currentChar, "ne to");
         }
     }
 
@@ -60,6 +66,13 @@ public class Tokenizer {
      */
     private boolean isDelimiter(Character character) {
         return "()[]{}`.,".contains(character.toString()); //TODO check if delimiter
+    }
+
+    private Token processDelimiter(){
+        previousCharacters = currentChar.toString();
+        readNextChar();
+        readCharsTillValuableChar();
+        return new Token(previousCharacters, Token.DELIMITER);
     }
 
     /**
@@ -97,7 +110,6 @@ public class Tokenizer {
             previousCharacters = previousCharacters + currentChar;
             readNextChar();
         }
-        readNextChar();
         readCharsTillValuableChar();
         return new Token(previousCharacters, Token.OPERATOR);
     }
@@ -107,7 +119,7 @@ public class Tokenizer {
      * reads characters while current character is not whitespace
      */
     private void readCharsTillValuableChar(){
-        while(currentChar.equals(" ")){
+        while(currentChar!= null && currentChar == ' '){
             readNextChar();
         }
     }
@@ -116,10 +128,10 @@ public class Tokenizer {
      * for shortness of the code
      */
     private void readNextChar() {
-        try {
-             currentChar = sourceCode.readChar();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(sourceCode.hasNext()) {
+            currentChar = sourceCode.next().toCharArray()[0];
+        } else {
+            currentChar = null;
         }
     }
 

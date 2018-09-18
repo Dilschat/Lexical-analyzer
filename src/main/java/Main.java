@@ -1,16 +1,36 @@
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args){
+        /*
         Character a = ';';
         String s;
         String pattern = "[a-zA-Z_][a-zA-Z0-9_]*";
         s = "1q_asd";
         System.out.println(s.matches(pattern));
+        */
 
-        printSetTests();
+        printTokensFromInputTxt();
+    }
+
+    private static void printTokensFromInputTxt() {
+        try {
+            Scanner scanner = new Scanner(new FileReader("input.txt"));
+            Tokenizer tokenizer = new Tokenizer(scanner);
+            Token token;
+            while(tokenizer.hasNext()){
+                token = tokenizer.getNextToken();
+                System.out.println(token.toString());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void printSetTests(){
