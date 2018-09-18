@@ -15,4 +15,9 @@ public class Token {
     public static final String KEYWORD = "Keyword";
     public static final String IDENTIFIER = "Identifier";
     public static final String OPERATOR = "Operator";
+
+    public String toString(){
+        return "(" + type + "," + element + ")";
+    }
+
 }

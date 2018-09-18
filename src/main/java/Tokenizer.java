@@ -1,4 +1,4 @@
-import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
+//import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -48,6 +48,20 @@ public class Tokenizer {
         }
     }
 
+    /**
+     * all operators in scala
+     * + - * / %
+     * == != > < >= <=
+     * && || !
+     * & | ^
+     * ~ << >> >>>
+     * = += -= *= /= %= <<= >>= &= ^= |=
+     *
+     *
+     * assume this functions is called only when current character is an beggining of the operator
+     * @return
+     * @throws Exception
+     */
     private Token processOperator() throws Exception {
         if("=!+-*/%&^|".contains(currentChar.toString())){ // simple operations without  < >
             previousCharacters = currentChar.toString();
@@ -65,7 +79,7 @@ public class Tokenizer {
         }
 
 
-        else if("<".contains(currentChar.toString())){ // processing <
+        else if("<".contains(currentChar.toString())){ // processing < <= <<= <<
             previousCharacters = currentChar.toString();
             readNextChar();
             if (currentChar.equals('=')){ // <=
@@ -73,11 +87,18 @@ public class Tokenizer {
                 readNextChar();
                 readCharsTillValuableChar();
                 return new Token(previousCharacters, Token.OPERATOR);
-            } else if(currentChar.equals('<')){// <<
+            } else if(currentChar.equals('<')){ // <<= or <<
                 previousCharacters = previousCharacters + currentChar.toString();
                 readNextChar();
-                readCharsTillValuableChar();
-                return new Token(previousCharacters, Token.OPERATOR);
+                if (currentChar.equals('=')){ // <<=
+                    previousCharacters = previousCharacters + currentChar.toString();
+                    readNextChar();
+                    readCharsTillValuableChar();
+                    return new Token(previousCharacters, Token.OPERATOR);
+                } else { // <<
+                    readCharsTillValuableChar();
+                    return new Token(previousCharacters, Token.OPERATOR);
+                }
             } else { // <
                 readNextChar();
                 readCharsTillValuableChar();
@@ -85,7 +106,7 @@ public class Tokenizer {
             }
         }
 
-        else if(">".contains(currentChar.toString())){ // proccessing >
+        else if(">".contains(currentChar.toString())){ // processing > >= >> >>= >>>
             previousCharacters = currentChar.toString();
             readNextChar();
             if (currentChar.equals('=')){ // >=
@@ -93,7 +114,7 @@ public class Tokenizer {
                 readNextChar();
                 readCharsTillValuableChar();
                 return new Token(previousCharacters, Token.OPERATOR);
-            } else if(currentChar.equals('>')){// >>
+            } else if(currentChar.equals('>')){// >> >>> >>=
                 previousCharacters = previousCharacters + currentChar.toString();
                 readNextChar();
                 if(currentChar.equals('>')){ // >>>
@@ -101,11 +122,16 @@ public class Tokenizer {
                     readNextChar();
                     readCharsTillValuableChar();
                     return new Token(previousCharacters, Token.OPERATOR);
-                } else {
+                }else if(currentChar.equals('=')) { // >>=
+                    previousCharacters = previousCharacters + currentChar.toString();
+                    readNextChar();
+                    readCharsTillValuableChar();
+                    return new Token(previousCharacters, Token.OPERATOR);
+                } else { // >>
                     readCharsTillValuableChar();
                     return new Token(previousCharacters, Token.OPERATOR);
                 }
-            } else {
+            } else { // >
                 readNextChar();
                 readCharsTillValuableChar();
                 return new Token(previousCharacters, Token.OPERATOR);
