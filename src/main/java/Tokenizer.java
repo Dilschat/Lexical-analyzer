@@ -91,7 +91,7 @@ public class Tokenizer {
                 index++;
                 return processIdentifier();
             } else if (isNumberLiteral()) {
-
+                return processNumericLiteral();
             } else if (isStringLiteral()) {
 
             } else if (isCharacterLiteral()) {
@@ -162,20 +162,27 @@ public class Tokenizer {
             return new Token(currentTokenBuffer, Token.LITERAL);
         }
         currentTokenBuffer+=currentLine.charAt(index);
-        if(StringUtils.isNumeric(currentTokenBuffer)){
-            processNumericLiteral();
+        if(NumberUtils.isCreatable(currentTokenBuffer)){
+            return processNumericLiteral();
         }else {
             index++;
             currentTokenBuffer+=currentLine.charAt(index);
-            if(StringUtils.isNumeric(currentTokenBuffer)){
-                processNumericLiteral();
+            if(NumberUtils.isCreatable(currentTokenBuffer)){
+                return processNumericLiteral();
             }else {
-                index-=1;
-                currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-2);
-                return new Token(currentTokenBuffer, Token.LITERAL);
+                index++;
+                currentTokenBuffer+=currentLine.charAt(index);
+                if(NumberUtils.isCreatable(currentTokenBuffer)){
+                    return processNumericLiteral();
+                }else {
+                    index-=2;
+                    currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
+                    return new Token(currentTokenBuffer, Token.LITERAL);
+                }
+
+
             }
         }
-        return null;
     }
 
     private boolean isIdentifier() {

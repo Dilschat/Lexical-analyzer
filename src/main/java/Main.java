@@ -1,4 +1,5 @@
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.*;
 import java.util.Arrays;
@@ -16,7 +17,7 @@ public class Main {
         System.out.println(s.matches(pattern));
         */
 
-        System.out.println(StringUtils.isAsciiPrintable("\\"));
+        System.out.println(NumberUtils.isCreatable("3.15e-5"));
         printTokensFromInputTxt();
     }
 
