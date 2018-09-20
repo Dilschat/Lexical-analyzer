@@ -1,1 +1,3 @@
-char a = 'sad'
+{
+    cat
+}

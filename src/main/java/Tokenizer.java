@@ -159,7 +159,11 @@ public class Tokenizer {
             throw new Exception("wrong character");
         }
         while (!(currentLine.charAt(index)=='\'')){
+            if(index+1>=currentLine.length()){
+                throw new Exception("wrong character");
+            }
             if(currentLine.charAt(index+1)=='\''){
+
                 currentTokenBuffer+=currentLine.charAt(index);
                 index++;
                 continue;
