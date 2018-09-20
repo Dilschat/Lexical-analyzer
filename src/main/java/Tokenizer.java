@@ -20,7 +20,7 @@ public class Tokenizer {
             "to", "trait", "true", "try", "until", "val", "var", "while", "with");
     private static HashSet<String> keywordsSet = new HashSet<String>(keywords);
     private static String indentifyierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
-    private static String delimiterPattern = "[;|,|.] "; // а как же {} ()
+    private static String delimiterPattern = "[;|,|.]{}(): "; // а как же {} ()
     //TODO add synatic noise
     private static List<String> operators =
             Arrays.asList("+", "-", "*", "/", "%",
@@ -168,13 +168,16 @@ public class Tokenizer {
             index++;
 
         }
-        if(Character.isDefined(currentTokenBuffer.charAt(0))){
-            index++;
-            return new Token(currentTokenBuffer,Token.LITERAL);
-        }
-        else {
+        if(currentTokenBuffer.length()>1){
             throw new Exception("wrong character");
+        }else {
+            if(Character.isDefined(currentTokenBuffer.charAt(0))){
+                index++;
+                return new Token(currentTokenBuffer,Token.LITERAL);
+            }
         }
+
+        return null;
     }
     private boolean isStringLiteral() {
         return false;
