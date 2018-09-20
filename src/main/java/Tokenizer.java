@@ -1,9 +1,6 @@
 //import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +36,13 @@ public class Tokenizer {
     //A character with Unicode between 0 and 255 may also be represented by an octal escape,
     // i.e. a backslash '\' followed by a sequence of up to three octal characters.
 
-    public Tokenizer(Scanner scanner){
-        sourceCode = scanner;
+    private String currentLine;
+    private String currentTokenBuffer;
+    private long currentChar;
+    private Scanner scanner;
+
+    public Tokenizer(String fileName) throws FileNotFoundException {
+        scanner = new Scanner(new FileReader(fileName));
     }
 
     public boolean hasNext(){
@@ -50,6 +52,14 @@ public class Tokenizer {
     //Draft impl. TODO finish according patterns above.
 
     public Token getNextToken() throws Exception {
-        return null;
+        if (currentLine.length() == 0) {
+            currentLine = scanner.nextLine();
+            currentChar = 0;
+        }
+        return processToken();
+    }
+
+    private Token processToken() {
+        
     }
 }
