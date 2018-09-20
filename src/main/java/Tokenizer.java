@@ -67,23 +67,22 @@ public class Tokenizer {
             currentTokenBuffer = currentTokenBuffer + currentLine.charAt(index);
             if(isDelimeter()){
                 return processDelimeter();
-            } else if(isOperator()){
+            } else if (isOperator()) {
                 return processOperator();
-            }else if(isKeyword()){
+            } else if (isKeyword()) {
+                return processKeyword();
+            } else if (isIdentifier()) {
 
-            }else if(isIdentifier()){
+            } else if (isNumberLiteral()) {
 
-            }else if(isNumberLiteral()){
+            } else if (isStringLiteral()) {
 
-            }else if(isStringLiteral()){
+            } else if (isCharacterLiteral()) {
 
-            }else  if(isCharacterLiteral()){
-
-            }
-            else {
-                if(index<currentLine.length()){
+            } else {
+                if (index < currentLine.length()) {
                     index++;
-                }else {
+                } else {
                     throw new Exception("Huinyu napisali");
                 }
             }
@@ -95,9 +94,10 @@ public class Tokenizer {
 
 
 
+
     private Token processDelimeter() {
         index++;
-        return new Token(currentTokenBuffer,Token.DELIMITER);
+        return new Token(currentTokenBuffer, Token.DELIMITER);
     }
 
     private boolean isDelimeter() {
@@ -115,7 +115,24 @@ public class Tokenizer {
     }
 
     private boolean isOperator() {
-       return operatorsSet.contains(currentTokenBuffer);
+        return operatorsSet.contains(currentTokenBuffer);
+    }
+
+    private Token processKeyword() {
+        index++;
+        if(currentLine.charAt(index)==' ' || currentLine.charAt(index)=='('){
+            return new Token(currentTokenBuffer, Token.KEYWORD);
+        }else {
+            return processIdentifier();
+        }
+    }
+
+    private Token processIdentifier() {
+        return null;
+    }
+
+    private boolean isKeyword() {
+        return operatorsSet.contains(currentTokenBuffer);
     }
 
     private boolean isCharacterLiteral() {
@@ -134,9 +151,6 @@ public class Tokenizer {
         return false;
     }
 
-    private boolean isKeyword() {
-        return false;
-    }
 
 
 
