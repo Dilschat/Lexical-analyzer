@@ -25,6 +25,8 @@ public class FilesTokenizer {
                     while(tokenizer.hasNext()){
                         try {
                             token = tokenizer.getNextToken();
+                            if(token == null)
+                                break; // шоб работало
                             writer.print(token.toString());
                             if (token.getElement().equals("\\n")) {
                                 writer.println();
