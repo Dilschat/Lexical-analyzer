@@ -135,7 +135,7 @@ public class Tokenizer {
         return new Token(currentTokenBuffer, Token.OPERATOR);
     }
 
-    private boolean isOperator() {
+    private boolean isOperator()  {
         return operatorsSet.contains(currentTokenBuffer);
     }
 
