@@ -17,7 +17,7 @@ public class Tokenizer {
             "to", "trait", "true", "try", "until", "val", "var", "while", "with");
     private static HashSet<String> keywordsSet = new HashSet<String>(keywords);
     private static String indentifyierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
-    private static String delimiterPattern = "[;|,|.]"; // а как же {} ()
+    private static String delimiterPattern = "[;|,|.] "; // а как же {} ()
     //TODO add synatic noise
     private static List<String> operators =
             Arrays.asList("+", "-", "*", "/", "%",
@@ -38,11 +38,13 @@ public class Tokenizer {
 
     private String currentLine;
     private String currentTokenBuffer;
-    private long currentChar;
+    private int index;
     private Scanner scanner;
 
     public Tokenizer(String fileName) throws FileNotFoundException {
         scanner = new Scanner(new FileReader(fileName));
+        currentTokenBuffer="";
+        currentLine="";
     }
 
     public boolean hasNext(){
@@ -52,14 +54,92 @@ public class Tokenizer {
     //Draft impl. TODO finish according patterns above.
 
     public Token getNextToken() throws Exception {
+        currentTokenBuffer="";
         if (currentLine.length() == 0) {
             currentLine = scanner.nextLine();
-            currentChar = 0;
+            index = 0;
         }
         return processToken();
     }
 
-    private Token processToken() {
-        
+    private Token processToken() throws Exception {
+        while (index <currentLine.length()){
+            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
+            if(isDelimeter()){
+                return processDelimeter();
+            } else if(isOperator()){
+                return processOperator();
+            }else if(isKeyword()){
+
+            }else if(isIdentifier()){
+
+            }else if(isNumberLiteral()){
+
+            }else if(isStringLiteral()){
+
+            }else  if(isCharacterLiteral()){
+
+            }
+            else {
+                if(index<currentLine.length()){
+                    index++;
+                }else {
+                    throw new Exception("Huinyu napisali");
+                }
+            }
+
+
+        }
+        return null;
     }
+
+
+
+    private Token processDelimeter() {
+        index++;
+        return new Token(currentTokenBuffer,Token.DELIMITER);
+    }
+
+    private boolean isDelimeter() {
+        return delimiterPattern.contains(currentTokenBuffer);
+    }
+
+    private Token processOperator() {
+        index++;
+        currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
+        if(isOperator()&&index<currentLine.length()-1){
+            processOperator();
+        }else{
+            currentTokenBuffer=currentTokenBuffer.substring(0,currentTokenBuffer.length()-1);
+        }
+        return new Token(currentTokenBuffer, Token.OPERATOR);
+    }
+
+    private boolean isOperator() {
+       return operatorsSet.contains(currentTokenBuffer);
+    }
+
+    private boolean isCharacterLiteral() {
+        return false;
+    }
+
+    private boolean isStringLiteral() {
+        return false;
+    }
+
+    private boolean isNumberLiteral() {
+        return false;
+    }
+
+    private boolean isIdentifier() {
+        return false;
+    }
+
+    private boolean isKeyword() {
+        return false;
+    }
+
+
+
+
 }

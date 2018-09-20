@@ -14,13 +14,13 @@ public class Main {
         System.out.println(s.matches(pattern));
         */
 
+
         printTokensFromInputTxt();
     }
 
     private static void printTokensFromInputTxt() {
         try {
-            Scanner scanner = new Scanner(new FileReader("input.txt"));
-            Tokenizer tokenizer = new Tokenizer(scanner);
+            Tokenizer tokenizer = new Tokenizer("input.txt");
             Token token;
 
             while(tokenizer.hasNext()){
