@@ -11,6 +11,22 @@ public class Token {
         this.type = type;
     }
 
+    public String getElement() {
+        return element;
+    }
+
+    public void setElement(String element) {
+        this.element = element;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public static final String DELIMITER = "Delimiter";
     public static final String KEYWORD = "Keyword";
     public static final String IDENTIFIER = "Identifier";

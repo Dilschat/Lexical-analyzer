@@ -23,7 +23,7 @@ public class Main {
             Tokenizer tokenizer = new Tokenizer("input.txt");
             Token token;
 
-            while(true){
+            while(tokenizer.hasNext()){
                 token = tokenizer.getNextToken();
                 if(token == null)
                     break;

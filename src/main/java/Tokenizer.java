@@ -40,6 +40,7 @@ public class Tokenizer {
     private String currentTokenBuffer;
     private int index;
     private Scanner scanner;
+    private boolean hasNext = true;
 
     public Tokenizer(String fileName) throws FileNotFoundException {
         scanner = new Scanner(new FileReader(fileName));
@@ -48,7 +49,12 @@ public class Tokenizer {
     }
 
     public boolean hasNext(){
-        return scanner.hasNext() || currentLine.length() > index;
+        return hasNext;
+    }
+
+    private void obrubatel(){
+        currentLine = currentLine.substring(index, currentLine.length());
+        index = 0;
     }
 
     //Draft impl. TODO finish according patterns above.
@@ -56,23 +62,31 @@ public class Tokenizer {
     public Token getNextToken() throws Exception {
         currentTokenBuffer="";
         if (currentLine.length() == 0) {
-            currentLine = scanner.nextLine();
-            index = 0;
+            if (! scanner.hasNext()){
+                hasNext = false;
+                return new Token("\\n", Token.DELIMITER);
+            } else {
+                currentLine = scanner.nextLine();
+                index = 0;
+                return new Token("\\n", Token.DELIMITER);
+            }
         }
         return processToken();
     }
 
+    //TODO: handle whitespaces
     private Token processToken() throws Exception {
-        while (index < currentLine.length() - 1){
+        while (index < currentLine.length()){
             currentTokenBuffer = currentTokenBuffer + currentLine.charAt(index);
-            if(isDelimeter()){
-                return processDelimeter();
+            if(isDelimiter()){
+                index++;
+                return processDelimiter();
             } else if (isOperator()) {
+                index++;
                 return processOperator();
-            } else if (isKeyword()) {
-                return processKeyword();
             } else if (isIdentifier()) {
-
+                index++;
+                return processIdentifier();
             } else if (isNumberLiteral()) {
 
             } else if (isStringLiteral()) {
@@ -95,22 +109,26 @@ public class Tokenizer {
 
 
 
-    private Token processDelimeter() {
-        index++;
+    private Token processDelimiter() {
+        obrubatel();
         return new Token(currentTokenBuffer, Token.DELIMITER);
     }
 
-    private boolean isDelimeter() {
+    private boolean isDelimiter() {
         return delimiterPattern.contains(currentTokenBuffer);
     }
 
     private Token processOperator() {
-        if (index < currentLine.length() -1){
-            index++;
+        if (index < currentLine.length()){
             currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
-            if (isOperator())
+            index++;
+            if (isOperator()) {
                 return processOperator();
+            }
+            index--;
+            currentTokenBuffer = currentTokenBuffer.substring(0, currentTokenBuffer.length()-1);
         }
+        obrubatel();
         return new Token(currentTokenBuffer, Token.OPERATOR);
     }
 
@@ -118,21 +136,8 @@ public class Tokenizer {
         return operatorsSet.contains(currentTokenBuffer);
     }
 
-    private Token processKeyword() {
-        index++;
-        if(currentLine.charAt(index)==' ' || currentLine.charAt(index)=='('){
-            return new Token(currentTokenBuffer, Token.KEYWORD);
-        }else {
-            return processIdentifier();
-        }
-    }
-
-    private Token processIdentifier() {
-        return null;
-    }
-
     private boolean isKeyword() {
-        return operatorsSet.contains(currentTokenBuffer);
+        return keywordsSet.contains(currentTokenBuffer);
     }
 
     private boolean isCharacterLiteral() {
@@ -148,11 +153,23 @@ public class Tokenizer {
     }
 
     private boolean isIdentifier() {
-        return false;
+        return currentTokenBuffer.matches(indentifyierPattern);
     }
 
-
-
-
-
+    private Token processIdentifier(){
+        if (index < currentLine.length()){
+            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
+            index++;
+            if (isIdentifier()) {
+                return processIdentifier();
+            }
+            index--;
+            currentTokenBuffer = currentTokenBuffer.substring(0, currentTokenBuffer.length()-1);
+        }
+        obrubatel();
+        if (isKeyword()){
+            return new Token(currentTokenBuffer, Token.KEYWORD);
+        }
+        return new Token(currentTokenBuffer, Token.IDENTIFIER);
+    }
 }
