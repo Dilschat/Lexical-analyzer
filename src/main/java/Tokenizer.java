@@ -1,5 +1,8 @@
 //import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -149,7 +152,30 @@ public class Tokenizer {
     }
 
     private boolean isNumberLiteral() {
-        return false;
+        return StringUtils.isNumeric(currentTokenBuffer);
+    }
+    private Token processNumericLiteral(){
+        if(index<currentLine.length()-1) {
+            index++;
+        }else {
+            index++;
+            return new Token(currentTokenBuffer, Token.LITERAL);
+        }
+        currentTokenBuffer+=currentLine.charAt(index);
+        if(StringUtils.isNumeric(currentTokenBuffer)){
+            processNumericLiteral();
+        }else {
+            index++;
+            currentTokenBuffer+=currentLine.charAt(index);
+            if(StringUtils.isNumeric(currentTokenBuffer)){
+                processNumericLiteral();
+            }else {
+                index-=1;
+                currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-2);
+                return new Token(currentTokenBuffer, Token.LITERAL);
+            }
+        }
+        return null;
     }
 
     private boolean isIdentifier() {

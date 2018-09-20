@@ -1,3 +1,5 @@
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,7 +16,7 @@ public class Main {
         System.out.println(s.matches(pattern));
         */
 
-
+        System.out.println(StringUtils.isAsciiPrintable("\\"));
         printTokensFromInputTxt();
     }
 
