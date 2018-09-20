@@ -22,6 +22,7 @@ public class Main {
             Scanner scanner = new Scanner(new FileReader("input.txt"));
             Tokenizer tokenizer = new Tokenizer(scanner);
             Token token;
+
             while(tokenizer.hasNext()){
                 token = tokenizer.getNextToken();
                 System.out.println(token.toString());
