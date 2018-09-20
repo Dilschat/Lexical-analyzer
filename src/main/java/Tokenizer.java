@@ -168,16 +168,19 @@ public class Tokenizer {
             index++;
 
         }
-        if(currentTokenBuffer.length()>1){
+        if(currentTokenBuffer.length()>1 && currentTokenBuffer.charAt(0)!='\\'){
             throw new Exception("wrong character");
         }else {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){
                 index++;
                 return new Token(currentTokenBuffer,Token.LITERAL);
             }
+            else {
+                throw new Exception("wrong character");
+
+            }
         }
 
-        return null;
     }
     private boolean isStringLiteral() {
         return false;
