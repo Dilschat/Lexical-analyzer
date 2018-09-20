@@ -39,142 +39,17 @@ public class Tokenizer {
     //A character with Unicode between 0 and 255 may also be represented by an octal escape,
     // i.e. a backslash '\' followed by a sequence of up to three octal characters.
 
-    private Character currentChar;
-    private String previousCharacters;
-
     public Tokenizer(Scanner scanner){
         sourceCode = scanner;
-        scanner.useDelimiter("");
-        readNextChar();
     }
 
     public boolean hasNext(){
-        return currentChar != null;
+        return true;
     }
 
     //Draft impl. TODO finish according patterns above.
 
     public Token getNextToken() throws Exception {
-        previousCharacters = "";
-        if (isDelimiter(currentChar)){
-            return processDelimiter();
-        } else if(isThisStartOfOperatorOrSyntaxNoise(currentChar)){
-            return processOperator();
-        } else if(isThisStartOfLiteral(currentChar)) {
-            return processLiteral();
-        } else {
-            readNextChar();
-            return new Token(currentChar, "ne to");
-        }
+        return null;
     }
-
-    /**
-     * ( ) [ ] { }
-     * ` ' " . ; ,
-     * @param character
-     * @return
-     */
-    private boolean isDelimiter(Character character) {
-        return "()[]{}`.,".contains(character.toString()); //TODO check if delimiter
-    }
-
-    private Token processDelimiter(){
-        previousCharacters = currentChar.toString();
-        readNextChar();
-        readCharsTillValuableChar();
-        return new Token(previousCharacters, Token.DELIMITER);
-    }
-
-    /**
-     * all operators in scala
-     * + - * / %
-     * == != > < >= <=
-     * && || !
-     * & | ^
-     * ~ << >> >>>
-     * = += -= *= /= %= <<= >>= &= ^= |=
-     * @param currentCHar
-     * @return
-     */
-    //TODO: check for syntax noise or REDO
-    private boolean isThisStartOfOperatorOrSyntaxNoise(Character currentCHar) {
-        return "+-*/%=!><&|^~".contains(currentCHar.toString());
-    }
-
-    /**
-     * all operators in scala
-     * + - * / %
-     * == != > < >= <=
-     * && || !
-     * & | ^
-     * ~ << >> >>>
-     * = += -= *= /= %= <<= >>= &= ^= |=
-     *
-     *
-     * assume this functions is called only when current character is an beginning of the operator
-     * @return
-     * @throws Exception
-     */
-    private Token processOperator(){
-        while(operatorsSet.contains(previousCharacters + currentChar.toString())){
-            previousCharacters = previousCharacters + currentChar;
-            readNextChar();
-        }
-        readCharsTillValuableChar();
-        return new Token(previousCharacters, Token.OPERATOR);
-    }
-
-
-    /**
-     * reads characters while current character is not whitespace
-     */
-    private void readCharsTillValuableChar(){
-        while(currentChar!= null && currentChar == ' '){
-            readNextChar();
-        }
-    }
-
-    /**
-     * for shortness of the code
-     */
-    private void readNextChar() {
-        if(sourceCode.hasNext()) {
-            currentChar = sourceCode.next().toCharArray()[0];
-        } else {
-            currentChar = null;
-        }
-    }
-
-
-    //TODO: DECOMMENT and do them
-
-    private boolean isThisStartOfLiteral(Character character) {
-        return Character.isDigit(character) || character.equals('"') || character.equals('\'');
-    }
-
-    private Token processLiteral() throws Exception {
-        previousCharacters = currentChar.toString();
-        
-    }
-
-    /*
-    Symbol literals
-symbolLiteral  ::=  ‘'’ plainid
-A symbol literal 'x is a shorthand for the expression scala.Symbol("x"). Symbol is a case class, which is defined as follows.
-
-package scala
-final case class Symbol private (name: String) {
-  override def toString: String = "'" + name
-}
-The apply method of Symbol's companion object caches weak references to Symbols, thus ensuring that identical symbol literals are equivalent with respect to reference equality.
-
-Whitespace and Commen
-     */
-
-    /*
-
-    boolean isThisStartOfKeywordOrIdentifier(Character character) {
-
-    }
-*/
 }
