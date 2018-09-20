@@ -84,6 +84,12 @@ public class Tokenizer {
             if(isDelimiter()){
                 index++;
                 return processDelimiter();
+            } else if (isMultilineStringLiteral()) {
+                index+=3;
+                return processMultilineString();
+            } else if (isBegnningStringLiteral()){
+                index++;
+                return processStringLiteral();
             } else if (isOperator()) {
                 index++;
                 return processOperator();
@@ -93,9 +99,8 @@ public class Tokenizer {
             } else if (isNumberLiteral()) {
                 return processNumericLiteral();
             } else if (isStringLiteral()) {
-
-            } else if (isCharacterLiteral()) {
-
+            } else if (currentTokenBuffer.equals("'")) {
+                return processCharacter();
             } else {
                 if (index < currentLine.length()) {
                     index++;
@@ -144,13 +149,82 @@ public class Tokenizer {
     }
 
     private boolean isCharacterLiteral() {
-        return false;
+        return Character.isDefined(currentTokenBuffer.charAt(0));
     }
+    private Token processCharacter() throws Exception {
+        currentTokenBuffer="";
+        if(index+1<currentLine.length()) {
+            index++;
+        }else {
+            throw new Exception("wrong character");
+        }
+        while (!(currentLine.charAt(index)=='\'')){
+            if(currentLine.charAt(index+1)=='\''){
+                currentTokenBuffer+=currentLine.charAt(index);
+                index++;
+                continue;
+            }
+            currentTokenBuffer+=currentLine.charAt(index);
+            index++;
 
+        }
+        if(Character.isDefined(currentTokenBuffer.charAt(0))){
+            index++;
+            return new Token(currentTokenBuffer,Token.LITERAL);
+        }
+        else {
+            throw new Exception("wrong character");
+        }
+    }
     private boolean isStringLiteral() {
         return false;
     }
+    private boolean isMultilineStringLiteral() {
+        return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
+                index+1 < currentLine.length() && currentLine.charAt(index+1) == '\"' &&
+                index+2 < currentLine.length() && currentLine.charAt(index+2) == '\"';
+    }
 
+    private Token processMultilineString() throws Exception {
+        currentTokenBuffer="\"\"\"";
+        while(!isMultilineStringLiteral()){
+            if(index == currentLine.length()){
+                currentTokenBuffer+="\n";
+                if (! scanner.hasNext()){
+                    throw new Exception("Unclosed multiline string");
+                } else {
+                    currentLine = scanner.nextLine();
+                    index = 0;
+                }
+            } else {
+                currentTokenBuffer += currentLine.charAt(index);
+                index++;
+            }
+        }
+        currentTokenBuffer +="\"\"\"";
+        index+=3;
+        obrubatel();
+        return new Token(currentTokenBuffer, Token.LITERAL);
+    }
+
+    public boolean isBegnningStringLiteral() {
+        return currentTokenBuffer.charAt(0) == '\"';
+    }
+
+    private Token processStringLiteral() throws Exception {
+        while(true){
+            currentTokenBuffer+=currentLine.charAt(index);
+            index++;
+            if (currentTokenBuffer.charAt(currentTokenBuffer.length()-1) == '\"' &&
+                    currentTokenBuffer.charAt(currentTokenBuffer.length()-2) != '\\') {
+                break;
+            }
+            if (index == currentLine.length())
+                throw new Exception("Unclosed string literal: " + currentTokenBuffer);
+        }
+        obrubatel();
+        return new Token(currentTokenBuffer, Token.LITERAL);
+    }
     private boolean isNumberLiteral() {
         return StringUtils.isNumeric(currentTokenBuffer);
     }
