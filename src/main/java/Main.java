@@ -23,8 +23,10 @@ public class Main {
             Tokenizer tokenizer = new Tokenizer("input.txt");
             Token token;
 
-            while(tokenizer.hasNext()){
+            while(true){
                 token = tokenizer.getNextToken();
+                if(token == null)
+                    break;
                 System.out.println(token.toString());
             }
         } catch (FileNotFoundException e) {

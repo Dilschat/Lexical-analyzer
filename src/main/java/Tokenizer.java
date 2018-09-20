@@ -48,7 +48,7 @@ public class Tokenizer {
     }
 
     public boolean hasNext(){
-        return true;
+        return scanner.hasNext() || currentLine.length() > index;
     }
 
     //Draft impl. TODO finish according patterns above.
@@ -63,8 +63,8 @@ public class Tokenizer {
     }
 
     private Token processToken() throws Exception {
-        while (index <currentLine.length()){
-            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
+        while (index < currentLine.length() - 1){
+            currentTokenBuffer = currentTokenBuffer + currentLine.charAt(index);
             if(isDelimeter()){
                 return processDelimeter();
             } else if(isOperator()){
@@ -105,12 +105,11 @@ public class Tokenizer {
     }
 
     private Token processOperator() {
-        index++;
-        currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
-        if(isOperator()&&index<currentLine.length()-1){
-            processOperator();
-        }else{
-            currentTokenBuffer=currentTokenBuffer.substring(0,currentTokenBuffer.length()-1);
+        if (index < currentLine.length() -1){
+            index++;
+            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
+            if (isOperator())
+                return processOperator();
         }
         return new Token(currentTokenBuffer, Token.OPERATOR);
     }
