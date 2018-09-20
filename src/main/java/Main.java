@@ -17,8 +17,9 @@ public class Main {
         System.out.println(s.matches(pattern));
         */
 
-        System.out.println(NumberUtils.isCreatable("3.15e-5"));
-        printTokensFromInputTxt();
+        String[] fileNames = {"input.txt"};
+        FilesTokenizer filesTokenizer = new FilesTokenizer(fileNames);
+        filesTokenizer.tokenizeFiles();
     }
 
     private static void printTokensFromInputTxt() {
