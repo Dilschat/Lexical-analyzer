@@ -26,7 +26,7 @@ class CharacterTypeUtilsTest {
         closureContainingCodeToTest = () -> {CharacterTypeUtils.processCharacter("''",0);};
         assertThrows(Exception.class,closureContainingCodeToTest,"wrong character");
         closureContainingCodeToTest = () -> {CharacterTypeUtils.processCharacter("'\\dsfdsfsdf'",0);};
-        assertThrows(Exception.class,closureContainingCodeToTest,"wrong character");
+        assertThrows(Exception.class,closureContainingCodeToTest,"wrong character");//TODO check bug
 
     }
 }
