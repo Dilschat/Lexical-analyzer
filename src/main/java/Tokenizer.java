@@ -88,16 +88,14 @@ public class Tokenizer {
                 return processOperator(currentLine);
             } else if (isIdentifier(Character.toString(currentLine.charAt(0)))) {
                 return processIdentifier(currentLine);
-            } else if (isNumberLiteral()) {
-                return processNumericLiteral();
-            } else if (currentTokenBuffer.equals("'")) {
-                return processCharacter();
+            } else if (isNumberLiteral(currentLine)) {
+                return processNumericLiteral("",currentLine,0);
+            } else if (currentLine.charAt(0)=='\'') {
+                return processCharacter(currentLine,0);
             } else {
-                if (index < currentLine.length()) {
-                    index++;
-                } else {
+
                     throw new Exception("Huinyu napisali");
-                }
+
             }
         }
         return null;
@@ -131,9 +129,6 @@ public class Tokenizer {
         return keywordsSet.contains(identifier);
     }
 
-    private boolean isCharacterLiteral() {
-        return Character.isDefined(currentTokenBuffer.charAt(0));
-    }
 
     private Token processCharacter(String currentLine,int index) throws Exception {
         String currentTokenBuffer="";
@@ -161,7 +156,6 @@ public class Tokenizer {
         }else {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){
                 index++;
-                obrubatel();
                 return new Token(currentTokenBuffer,Token.LITERAL_CHARACTER);
             }
             else {
