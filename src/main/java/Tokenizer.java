@@ -84,14 +84,12 @@ public class Tokenizer {
                 return processDelimiter();
             } else if (isMultilineStringLiteral(0)) {
                 return processMultilineString();
-            } else if (isBeginningStringLiteral()){
-                return processStringLiteral();
+            } else if (isBeginningStringLiteral(currentLine.charAt(0))){
+                return processStringLiteral(currentLine);
             } else if (isOperator(Character.toString(currentLine.charAt(0)))) {
-                index++;
-                return processOperator();
-            } else if (isIdentifier()) {
-                index++;
-                return processIdentifier();
+                return processOperator(currentLine);
+            } else if (isIdentifier(Character.toString(currentLine.charAt(0)))) {
+                return processIdentifier(currentLine);
             } else if (isNumberLiteral()) {
                 return processNumericLiteral();
             } else if (currentTokenBuffer.equals("'")) {
@@ -115,7 +113,7 @@ public class Tokenizer {
         return delimiterPattern.contains(Character.toString(currentLine.charAt(0)));
     }
 
-    private Token processOperator() {
+    private Token processOperator(String currentLine) {
         String currentTokenBuffer = Character.toString(currentLine.charAt(0));
         int index = 1;
         if (isOperator(currentLine.substring(0,2))){
@@ -175,9 +173,7 @@ public class Tokenizer {
         }
 
     }
-    private boolean isStringLiteral() {
-        return false;
-    }
+
     private boolean isMultilineStringLiteral(int index) {
         return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
                 index+1 < currentLine.length() && currentLine.charAt(index+1) == '\"' &&
@@ -186,7 +182,7 @@ public class Tokenizer {
 
     private Token processMultilineString() throws Exception {
         int index = 3;
-        String currentTokenBuffer="\"\"\"";
+        String currentTokenBuffer="";
         while(!isMultilineStringLiteral(index)){
             if(index == currentLine.length()){
                 currentTokenBuffer+="\n";
@@ -201,15 +197,14 @@ public class Tokenizer {
                 index++;
             }
         }
-        currentTokenBuffer +="\"\"\"";
         return new Token(currentTokenBuffer, Token.LITERAL_MULTILINE_STRING);
     }
 
-    public boolean isBeginningStringLiteral() {
-        return currentLine.charAt(0) == '\"';
+    public boolean isBeginningStringLiteral(char startLine) {
+        return startLine == '\"';
     }
 
-    private Token processStringLiteral() throws Exception {
+    private Token processStringLiteral(String currentLine) throws Exception {
         String currentTokenBuffer = "";
         int index = 1;
         while(true){
@@ -264,18 +259,14 @@ public class Tokenizer {
         return identifier.matches(indentifyierPattern);
     }
 
-    private Token processIdentifier(){
-        if (index < currentLine.length()){
+    private Token processIdentifier(String currentLine) {
+        String currentTokenBuffer = currentLine.substring(0,1);
+        int index = 1;
+        while (isOperator(currentTokenBuffer + currentLine.charAt(index))){
             currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
             index++;
-            if (isIdentifier()) {
-                return processIdentifier();
-            }
-            index--;
-            currentTokenBuffer = currentTokenBuffer.substring(0, currentTokenBuffer.length()-1);
         }
-        obrubatel();
-        if (isKeyword()){
+        if (isKeyword(currentTokenBuffer)){
             return new Token(currentTokenBuffer, Token.KEYWORD);
         }
         return new Token(currentTokenBuffer, Token.IDENTIFIER);
