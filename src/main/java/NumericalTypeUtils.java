@@ -16,7 +16,6 @@ public class NumericalTypeUtils {
         if(index<currentLine.length()-1) {
             index++;
         }else {
-            index++;
             return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
         }
         currentTokenBuffer+=currentLine.charAt(index);
@@ -34,7 +33,6 @@ public class NumericalTypeUtils {
 
                     return processNumericLiteral(currentTokenBuffer,currentLine, index);
                 }else {
-                    index-=2;
                     currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
                     return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
                 }

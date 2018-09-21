@@ -1,7 +1,11 @@
 public class CharacterTypeUtils {
 
     public static boolean isCharacter(String line){
-        return line.charAt(0)=='\'';
+        if(line.length()!=0) {
+            return line.charAt(0) == '\'';
+        }else {
+            return false;
+        }
     }
 
 
@@ -31,7 +35,7 @@ public class CharacterTypeUtils {
         }else {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){
                 index++;
-                return new Token(currentTokenBuffer,Token.LITERAL_CHARACTER);
+                return new Token("\'"+currentTokenBuffer+"\'",Token.LITERAL_CHARACTER);
             }
             else {
                 throw new Exception("wrong character");

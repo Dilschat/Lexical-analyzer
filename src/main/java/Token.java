@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Token {
     private String element;
     private String type;
@@ -42,4 +44,18 @@ public class Token {
         return "(" + type + "," + element + ")";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Token token = (Token) o;
+        return Objects.equals(element, token.element) &&
+                Objects.equals(type, token.type);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(element, type);
+    }
 }
