@@ -2,15 +2,29 @@ public class Token {
     private String element;
     private String type;
     private String subtype;
-    
+
     public Token(String element, String type) {
         this.element = element;
         this.type = type;
     }
 
+    public Token(String element, String type, String subtype) {
+        this.element = element;
+        this.type = type;
+        this.subtype = subtype;
+    }
+
     public Token(Character element, String type) {
         this.element = element.toString();
         this.type = type;
+    }
+
+    public String getSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(String subtype) {
+        this.subtype = subtype;
     }
 
     public String getElement() {

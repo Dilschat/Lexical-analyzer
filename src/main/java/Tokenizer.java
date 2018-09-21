@@ -40,14 +40,11 @@ public class Tokenizer {
     // i.e. a backslash '\' followed by a sequence of up to three octal characters.
 
     private String currentLine;
-    private String currentTokenBuffer;
-    private int index;
     private Scanner scanner;
     private boolean hasNext = true;
 
     public Tokenizer(String fileName) throws FileNotFoundException {
         scanner = new Scanner(new FileReader(fileName));
-        currentTokenBuffer="";
         currentLine="";
     }
 
@@ -55,9 +52,8 @@ public class Tokenizer {
         return hasNext;
     }
 
-    private void obrubatel(){
-        currentLine = currentLine.substring(index, currentLine.length());
-        index = 0;
+    private void obrubatel(Token token){
+        currentLine = currentLine.substring(token.getElement().length(), currentLine.length());
     }
 
     //Draft impl. TODO finish according patterns above.
@@ -69,27 +65,24 @@ public class Tokenizer {
                 return new Token("\\n", Token.DELIMITER);
             } else {
                 currentLine = scanner.nextLine();
-                index = 0;
                 return new Token("\\n", Token.DELIMITER);
             }
         }
         Token token = processToken();
+        obrubatel(token);
         while (token.getElement().equals(" ")){
             token = getNextToken();
+            obrubatel(token);
         }
         return token;
     }
 
     //TODO: handle whitespaces
     private Token processToken() throws Exception {
-        currentTokenBuffer="";
-        while (index < currentLine.length()){
-            currentTokenBuffer = currentTokenBuffer + currentLine.charAt(index);
+        if (currentLine.length() > 0){
             if(isDelimiter()){
-                index++;
                 return processDelimiter();
-            } else if (isMultilineStringLiteral()) {
-                index+=3;
+            } else if (isMultilineStringLiteral(0)) {
                 return processMultilineString();
             } else if (isBegnningStringLiteral()){
                 index++;
@@ -115,16 +108,12 @@ public class Tokenizer {
         return null;
     }
 
-
-
-
     private Token processDelimiter() {
-        obrubatel();
-        return new Token(currentTokenBuffer, Token.DELIMITER);
+        return new Token(currentLine.charAt(0), Token.DELIMITER);
     }
 
     private boolean isDelimiter() {
-        return delimiterPattern.contains(currentTokenBuffer);
+        return delimiterPattern.contains(Character.toString(currentLine.charAt(0)));
     }
 
     private Token processOperator() {
@@ -191,13 +180,14 @@ public class Tokenizer {
     private boolean isStringLiteral() {
         return false;
     }
-    private boolean isMultilineStringLiteral() {
+    private boolean isMultilineStringLiteral(int index) {
         return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
                 index+1 < currentLine.length() && currentLine.charAt(index+1) == '\"' &&
                 index+2 < currentLine.length() && currentLine.charAt(index+2) == '\"';
     }
 
     private Token processMultilineString() throws Exception {
+        int index = 0;
         currentTokenBuffer="\"\"\"";
         while(!isMultilineStringLiteral()){
             if(index == currentLine.length()){
