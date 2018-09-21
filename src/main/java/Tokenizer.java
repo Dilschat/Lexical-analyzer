@@ -13,22 +13,7 @@ public class Tokenizer {
 
     private Scanner sourceCode;
 
-    //TODO map all lists to hashtable for perfomance improving
-    private static List<String> keywords = Arrays.asList("case", "catch", "class",
-            "def", "do", "else", "extends", "false", "final", "for", "if",
-            "match", "new", "null", "print", "printf", "println", "throw",
-            "to", "trait", "true", "try", "until", "val", "var", "while", "with");
-    private static HashSet<String> keywordsSet = new HashSet<String>(keywords);
-    private static String indentifyierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
-    private static String delimiterPattern = "[;,.]{}(): ";
     //TODO add synatic noise
-    private static List<String> operators =
-            Arrays.asList("+", "-", "*", "/", "%",
-                    "==", "<=", ">=", "!=", ">", "<", "!",
-                    "||", "&&", "&", "|", "~", "^", ">>>",
-                    "<<", ">>", "=", "+=", "-=", "*=", "/=",
-                    "%=", "<<=", ">>=", "^=", "|=", "&=");
-    private static HashSet<String> operatorsSet = new HashSet<String>(operators);
 
     private static List<Character> printableEscapeCharacters =
             Arrays.asList('\b', '\t', '\n', '\f', '\r', '\"', '\'', '\\');
@@ -43,7 +28,11 @@ public class Tokenizer {
 
     public Tokenizer(String fileName) throws FileNotFoundException {
         scanner = new Scanner(new FileReader(fileName));
-        currentLine="";
+        if (scanner.hasNext()) {
+            currentLine = scanner.nextLine();
+        } else {
+            hasNext = false;
+        }
     }
 
     public boolean hasNext(){
@@ -59,9 +48,77 @@ public class Tokenizer {
         currentLine = currentLine.substring(start, currentLine.length());
     }
 
+    private void obrubatel(int amount){
+        currentLine = currentLine.substring(amount, currentLine.length());
+    }
+
     //Draft impl. TODO finish according patterns above.
 
     public Token getNextToken() throws Exception {
+        try {
+            Token token = processIgnoredCode();
+            if (token != null)
+                return token;
+            token = checkEndOfLine();
+            if (token != null)
+                return token;
+            token = processToken();
+            obrubatel(token);
+            return token;
+        } catch (Exception e) {
+            hasNext = false;
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    private Token processIgnoredCode() throws Exception {
+        boolean everyThingIsClear = false;
+        while(!everyThingIsClear) {
+            everyThingIsClear = true;
+            if (currentLine.length()>0 && currentLine.charAt(0) == ' ') {
+                obrubatel(1);
+                everyThingIsClear = false;
+            }
+            if (currentLine.length() > 0 && currentLine.charAt(0) == '/'
+                    && currentLine.length() > 1 && currentLine.charAt(1) == '/') {
+                if (!scanner.hasNext()) {
+                    hasNext = false;
+                } else {
+                    currentLine = scanner.nextLine();
+                }
+                return new Token("\\n", Token.DELIMITER);
+            }
+            if (currentLine.length() > 0 && currentLine.charAt(0) == '/'
+                    && currentLine.length() > 1 && currentLine.charAt(1) == '*') {
+                everyThingIsClear = false;
+                obrubatel(2);
+                while (! (currentLine.length() > 0 && currentLine.charAt(0) == '*'
+                        && currentLine.length() > 1 && currentLine.charAt(1) == '/')) {
+                    if (currentLine.length() == 0) {
+                        if (scanner.hasNext()) {
+                            currentLine = scanner.nextLine();
+                        } else {
+                            throw new Exception("Unclosed multiline comment");
+                        }
+                    } else {
+                        obrubatel(1);
+                    }
+                }
+                obrubatel(2);
+                if (currentLine.length() == 0) {
+                    if (scanner.hasNext()) {
+                        currentLine = scanner.nextLine();
+                    } else {
+                        hasNext = false;
+                    }
+                    return new Token("\\n", Token.DELIMITER);
+                }
+            }
+        }
+        return null;
+    }
+
+    private Token checkEndOfLine() {
         if (currentLine.length() == 0) {
             if (! scanner.hasNext()){
                 hasNext = false;
@@ -71,65 +128,31 @@ public class Tokenizer {
                 return new Token("\\n", Token.DELIMITER);
             }
         }
-        Token token = processToken();
-        obrubatel(token);
-        if (token.getElement().equals(" ")){
-            return getNextToken();
-        }
-        return token;
+        return null;
     }
 
     //TODO: handle whitespaces
     private Token processToken() throws Exception {
         if (currentLine.length() > 0){
-            if(isDelimiter()){
-                return processDelimiter();
-            } else if (isMultilineStringLiteral(0)) {
-                return processMultilineString();
-            } else if (isBeginningStringLiteral(currentLine.charAt(0))){
-                return processStringLiteral(currentLine);
-            } else if (isOperator(Character.toString(currentLine.charAt(0)))) {
-                return processOperator(currentLine);
-            } else if (isIdentifier(Character.toString(currentLine.charAt(0)))) {
-                return processIdentifier(currentLine);
+            if(DelimiterUtils.isDelimiter(currentLine)){
+                return DelimiterUtils.processDelimiter(currentLine);
+            } else if (StringLiteralUtils.isMultilineStringLiteral(0, currentLine)) {
+                return StringLiteralUtils.processMultilineString(currentLine, scanner);
+            } else if (StringLiteralUtils.isBeginningStringLiteral(currentLine.charAt(0))){
+                return StringLiteralUtils.processStringLiteral(currentLine);
+            } else if (OperatorUtils.isOperator(Character.toString(currentLine.charAt(0)))) {
+                return OperatorUtils.processOperator(currentLine);
+            } else if (IdentifierKeywordUtils.isIdentifier(Character.toString(currentLine.charAt(0)))) {
+                return IdentifierKeywordUtils.processIdentifier(currentLine);
             } else if (isNumberLiteral(currentLine)) {
                 return processNumericLiteral("",currentLine,0);
             } else if (currentLine.charAt(0)=='\'') {
                 return processCharacter(currentLine,0);
             } else {
-
                     throw new Exception("Huinyu napisali");
-
             }
         }
         return null;
-    }
-
-    private Token processDelimiter() {
-        return new Token(currentLine.charAt(0), Token.DELIMITER);
-    }
-
-    private boolean isDelimiter() {
-        return delimiterPattern.contains(Character.toString(currentLine.charAt(0)));
-    }
-
-    private Token processOperator(String currentLine) {
-        String currentTokenBuffer = Character.toString(currentLine.charAt(0));
-        if (currentLine.length() >= 2 && isOperator(currentLine.substring(0,2))){
-            currentTokenBuffer = currentLine.substring(0,2);
-            if(currentLine.length() >= 3 && isOperator(currentLine.substring(0,3))){
-                currentTokenBuffer = currentLine.substring(0,3);
-            }
-        }
-        return new Token(currentTokenBuffer, Token.OPERATOR);
-    }
-
-    private boolean isOperator(String operator)  {
-        return operatorsSet.contains(operator);
-    }
-
-    private boolean isKeyword(String identifier) {
-        return keywordsSet.contains(identifier);
     }
 
 
@@ -169,53 +192,6 @@ public class Tokenizer {
 
     }
 
-    private boolean isMultilineStringLiteral(int index) {
-        return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
-                index+1 < currentLine.length() && currentLine.charAt(index+1) == '\"' &&
-                index+2 < currentLine.length() && currentLine.charAt(index+2) == '\"';
-    }
-
-    private Token processMultilineString() throws Exception {
-        int index = 3;
-        String currentTokenBuffer="\"\"\"";
-        while(!isMultilineStringLiteral(index)){
-            if(index == currentLine.length()){
-                currentTokenBuffer+="\n";
-                if (! scanner.hasNext()){
-                    throw new Exception("Unclosed multiline string");
-                } else {
-                    currentLine = scanner.nextLine();
-                    index = 0;
-                }
-            } else {
-                currentTokenBuffer += currentLine.charAt(index);
-                index++;
-            }
-        }
-        currentTokenBuffer+="\"\"\"";
-        return new Token(currentTokenBuffer, Token.LITERAL_MULTILINE_STRING);
-    }
-
-    public boolean isBeginningStringLiteral(char startLine) {
-        return startLine == '\"';
-    }
-
-    private Token processStringLiteral(String currentLine) throws Exception {
-        String currentTokenBuffer = "\"";
-        int index = 1;
-        while(true){
-            currentTokenBuffer+=currentLine.charAt(index);
-            index++;
-            if (currentTokenBuffer.charAt(currentTokenBuffer.length()-1) == '\"' &&
-                    currentTokenBuffer.charAt(currentTokenBuffer.length()-2) != '\\') {
-                break;
-            }
-            if (index == currentLine.length())
-                throw new Exception("Unclosed string literal: " + currentTokenBuffer);
-        }
-        return new Token(currentTokenBuffer, Token.LITERAL_STRING);
-    }
-
     private boolean isNumberLiteral(String currentTokenBuffer) {
         return StringUtils.isNumeric(Character.toString(currentTokenBuffer.charAt(0)));
     }
@@ -251,26 +227,7 @@ public class Tokenizer {
                     currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
                     return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
                 }
-
-
             }
         }
-    }
-
-    private boolean isIdentifier(String str) {
-        return str.matches(indentifyierPattern);
-    }
-
-    private Token processIdentifier(String currentLine) {
-        String currentTokenBuffer = currentLine.substring(0,1);
-        int index = 1;
-        while (index < currentLine.length() && isIdentifier(currentTokenBuffer + currentLine.charAt(index)) ){
-            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
-            index++;
-        }
-        if (isKeyword(currentTokenBuffer)){
-            return new Token(currentTokenBuffer, Token.KEYWORD);
-        }
-        return new Token(currentTokenBuffer, Token.IDENTIFIER);
     }
 }

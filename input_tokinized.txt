@@ -1,2 +1,4 @@
 (Delimiter,\n)
-(Operator,-)(Operator,-)(Delimiter,;)(Delimiter,()(Delimiter,))(Delimiter,{)(Delimiter,})(Delimiter,[)(Delimiter,])(Delimiter,\n)
+(Delimiter,\n)
+(Identifier,dd)(Delimiter,\n)
+(String literal,"fdfdf")(Delimiter,\n)

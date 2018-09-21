@@ -1,2 +1,8 @@
--- ; () {} []
-3.0e-13
+//abcd
+/*aa
+bb
+
+cc
+ee*/
+/*dd*/ dd
+"fdfdf"
