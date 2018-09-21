@@ -236,7 +236,7 @@ public class Tokenizer {
         }
         currentTokenBuffer+=currentLine.charAt(index);
         if(NumberUtils.isCreatable(currentTokenBuffer)){
-            return processNumericLiteral(currentTokenBuffer,currentLine, indx));
+            return processNumericLiteral(currentTokenBuffer,currentLine, indx);
         }else {
             index++;
             currentTokenBuffer+=currentLine.charAt(index);
