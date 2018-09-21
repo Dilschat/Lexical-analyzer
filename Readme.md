@@ -1,8 +1,8 @@
-#Lexer for Scala language (Homework 2)
+# Lexer for Scala language (Homework 2)
 This lexer implemented according specifications from [offical site](https://www.scala-lang.org/files/archive/spec/2.11/) of Scala language.
 We choose Java language for implementation.
 
-###Our notation for Tokens
+### Our notation for Tokens
 Types of Tokens:  
   * **Delimiters** \
    [;|,|.]{}(): 
