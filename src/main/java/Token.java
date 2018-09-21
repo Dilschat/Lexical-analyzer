@@ -1,6 +1,8 @@
 public class Token {
     private String element;
     private String type;
+    private String subtype;
+    
     public Token(String element, String type) {
         this.element = element;
         this.type = type;

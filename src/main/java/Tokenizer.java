@@ -63,7 +63,6 @@ public class Tokenizer {
     //Draft impl. TODO finish according patterns above.
 
     public Token getNextToken() throws Exception {
-        currentTokenBuffer="";
         if (currentLine.length() == 0) {
             if (! scanner.hasNext()){
                 hasNext = false;
@@ -74,11 +73,16 @@ public class Tokenizer {
                 return new Token("\\n", Token.DELIMITER);
             }
         }
-        return processToken();
+        Token token = processToken();
+        while (token.getElement().equals(" ")){
+            token = getNextToken();
+        }
+        return token;
     }
 
     //TODO: handle whitespaces
     private Token processToken() throws Exception {
+        currentTokenBuffer="";
         while (index < currentLine.length()){
             currentTokenBuffer = currentTokenBuffer + currentLine.charAt(index);
             if(isDelimiter()){
@@ -98,7 +102,6 @@ public class Tokenizer {
                 return processIdentifier();
             } else if (isNumberLiteral()) {
                 return processNumericLiteral();
-            } else if (isStringLiteral()) {
             } else if (currentTokenBuffer.equals("'")) {
                 return processCharacter();
             } else {
@@ -108,8 +111,6 @@ public class Tokenizer {
                     throw new Exception("Huinyu napisali");
                 }
             }
-
-
         }
         return null;
     }
@@ -177,6 +178,7 @@ public class Tokenizer {
         }else {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){
                 index++;
+                obrubatel();
                 return new Token(currentTokenBuffer,Token.LITERAL);
             }
             else {
