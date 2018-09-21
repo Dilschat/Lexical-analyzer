@@ -217,7 +217,7 @@ public class Tokenizer {
     }
 
     private boolean isNumberLiteral(String currentTokenBuffer) {
-        return StringUtils.isNumeric(currentTokenBuffer);
+        return StringUtils.isNumeric(Character.toString(currentTokenBuffer.charAt(0)));
     }
 
     private Token processNumericLiteral(String previousString, String currentLine, int indx){
@@ -227,25 +227,25 @@ public class Tokenizer {
             currentTokenBuffer = Character.toString(currentLine.charAt(0));
         }
         if(index<currentLine.length()-1) {
-            index++;
+            index+=1;
         }else {
-            index++;
+            index+=1;
             return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
         }
         currentTokenBuffer+=currentLine.charAt(index);
         if(NumberUtils.isCreatable(currentTokenBuffer)){
-            return processNumericLiteral(currentTokenBuffer,currentLine, indx);
+            return processNumericLiteral(currentTokenBuffer,currentLine, index);
         }else {
             index++;
             currentTokenBuffer+=currentLine.charAt(index);
             if(NumberUtils.isCreatable(currentTokenBuffer)){
-                return processNumericLiteral(currentTokenBuffer,currentLine,indx);
+                return processNumericLiteral(currentTokenBuffer,currentLine,index);
             }else {
                 index++;
                 currentTokenBuffer+=currentLine.charAt(index);
                 if(NumberUtils.isCreatable(currentTokenBuffer)){
 
-                    return processNumericLiteral(currentTokenBuffer,currentLine, indx);
+                    return processNumericLiteral(currentTokenBuffer,currentLine, index);
                 }else {
                     index-=2;
                     currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
