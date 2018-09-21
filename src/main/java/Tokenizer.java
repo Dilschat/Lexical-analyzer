@@ -29,8 +29,6 @@ public class Tokenizer {
                     "<<", ">>", "=", "+=", "-=", "*=", "/=",
                     "%=", "<<=", ">>=", "^=", "|=", "&=");
     private static HashSet<String> operatorsSet = new HashSet<String>(operators);
-    private static List<String> literalPattern = Arrays.asList("\"[[\\s|\\S]*\"]"/*string pattern*/,
-            "[0-9]*"/*number pattern*/, "[0-9]*.[0-9]*[[e][-|+][[0-9]*[d]?]]?", "\"\"\"[[\\s|\\S|\n]*]\"\"\"");
 
     private static List<Character> printableEscapeCharacters =
             Arrays.asList('\b', '\t', '\n', '\f', '\r', '\"', '\'', '\\');
@@ -137,8 +135,8 @@ public class Tokenizer {
         return Character.isDefined(currentTokenBuffer.charAt(0));
     }
 
-    private Token processCharacter() throws Exception {
-        currentTokenBuffer="";
+    private Token processCharacter(String currentLine,int index) throws Exception {
+        String currentTokenBuffer="";
         if(index+1<currentLine.length()) {
             index++;
         }else {
@@ -164,7 +162,7 @@ public class Tokenizer {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){
                 index++;
                 obrubatel();
-                return new Token(currentTokenBuffer,Token.LITERAL);
+                return new Token(currentTokenBuffer,Token.LITERAL_CHARACTER);
             }
             else {
                 throw new Exception("wrong character");
