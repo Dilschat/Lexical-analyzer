@@ -1,30 +1,15 @@
 public class Token {
     private String element;
     private String type;
-    private String subtype;
 
     public Token(String element, String type) {
         this.element = element;
         this.type = type;
     }
 
-    public Token(String element, String type, String subtype) {
-        this.element = element;
-        this.type = type;
-        this.subtype = subtype;
-    }
-
     public Token(Character element, String type) {
         this.element = element.toString();
         this.type = type;
-    }
-
-    public String getSubtype() {
-        return subtype;
-    }
-
-    public void setSubtype(String subtype) {
-        this.subtype = subtype;
     }
 
     public String getElement() {
@@ -47,7 +32,11 @@ public class Token {
     public static final String KEYWORD = "Keyword";
     public static final String IDENTIFIER = "Identifier";
     public static final String OPERATOR = "Operator";
-    public static final String LITERAL = "Literal";
+    //public static final String LITERAL = "Literal";
+    public static final String LITERAL_CHARACTER = "Character literal";
+    public static final String LITERAL_STRING = "String literal";
+    public static final String LITERAL_MULTILINE_STRING = "Multiline string literal";
+    public static final String LITERAL_NUMERIC = "Numeric literal";
 
     public String toString(){
         return "(" + type + "," + element + ")";

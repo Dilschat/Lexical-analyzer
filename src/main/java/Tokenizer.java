@@ -84,7 +84,7 @@ public class Tokenizer {
                 return processDelimiter();
             } else if (isMultilineStringLiteral(0)) {
                 return processMultilineString();
-            } else if (isBegnningStringLiteral()){
+            } else if (isBeginningStringLiteral()){
                 index++;
                 return processStringLiteral();
             } else if (isOperator()) {
@@ -187,9 +187,9 @@ public class Tokenizer {
     }
 
     private Token processMultilineString() throws Exception {
-        int index = 0;
-        currentTokenBuffer="\"\"\"";
-        while(!isMultilineStringLiteral()){
+        int index = 3;
+        String currentTokenBuffer="\"\"\"";
+        while(!isMultilineStringLiteral(index)){
             if(index == currentLine.length()){
                 currentTokenBuffer+="\n";
                 if (! scanner.hasNext()){
@@ -204,16 +204,16 @@ public class Tokenizer {
             }
         }
         currentTokenBuffer +="\"\"\"";
-        index+=3;
-        obrubatel();
-        return new Token(currentTokenBuffer, Token.LITERAL);
+        return new Token(currentTokenBuffer, Token.LITERAL_STRING);
     }
 
-    public boolean isBegnningStringLiteral() {
-        return currentTokenBuffer.charAt(0) == '\"';
+    public boolean isBeginningStringLiteral() {
+        return currentLine.charAt(0) == '\"';
     }
 
     private Token processStringLiteral() throws Exception {
+        String currentTokenBuffer = "";
+        int index = 1;
         while(true){
             currentTokenBuffer+=currentLine.charAt(index);
             index++;
