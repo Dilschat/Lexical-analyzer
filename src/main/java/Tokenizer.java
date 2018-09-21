@@ -20,7 +20,7 @@ public class Tokenizer {
             "to", "trait", "true", "try", "until", "val", "var", "while", "with");
     private static HashSet<String> keywordsSet = new HashSet<String>(keywords);
     private static String indentifyierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
-    private static String delimiterPattern = "[;|,|.]{}(): "; // а как же {} ()
+    private static String delimiterPattern = "[;,.]{}(): ";
     //TODO add synatic noise
     private static List<String> operators =
             Arrays.asList("+", "-", "*", "/", "%",
@@ -51,7 +51,12 @@ public class Tokenizer {
     }
 
     private void obrubatel(Token token){
-        currentLine = currentLine.substring(token.getElement().length(), currentLine.length());
+        int start = token.getElement().length();
+        if (token.getType().equals(Token.LITERAL_MULTILINE_STRING)){
+            start = token.getElement().split("\n").length-1;
+            start = token.getElement().split("\n")[start].length();
+        }
+        currentLine = currentLine.substring(start, currentLine.length());
     }
 
     //Draft impl. TODO finish according patterns above.
@@ -68,9 +73,8 @@ public class Tokenizer {
         }
         Token token = processToken();
         obrubatel(token);
-        while (token.getElement().equals(" ")){
-            token = getNextToken();
-            obrubatel(token);
+        if (token.getElement().equals(" ")){
+            return getNextToken();
         }
         return token;
     }
@@ -111,10 +115,9 @@ public class Tokenizer {
 
     private Token processOperator(String currentLine) {
         String currentTokenBuffer = Character.toString(currentLine.charAt(0));
-        int index = 1;
-        if (isOperator(currentLine.substring(0,2))){
+        if (currentLine.length() >= 2 && isOperator(currentLine.substring(0,2))){
             currentTokenBuffer = currentLine.substring(0,2);
-            if(isOperator(currentLine.substring(0,3))){
+            if(currentLine.length() >= 3 && isOperator(currentLine.substring(0,3))){
                 currentTokenBuffer = currentLine.substring(0,3);
             }
         }
@@ -174,7 +177,7 @@ public class Tokenizer {
 
     private Token processMultilineString() throws Exception {
         int index = 3;
-        String currentTokenBuffer="";
+        String currentTokenBuffer="\"\"\"";
         while(!isMultilineStringLiteral(index)){
             if(index == currentLine.length()){
                 currentTokenBuffer+="\n";
@@ -189,6 +192,7 @@ public class Tokenizer {
                 index++;
             }
         }
+        currentTokenBuffer+="\"\"\"";
         return new Token(currentTokenBuffer, Token.LITERAL_MULTILINE_STRING);
     }
 
@@ -197,7 +201,7 @@ public class Tokenizer {
     }
 
     private Token processStringLiteral(String currentLine) throws Exception {
-        String currentTokenBuffer = "";
+        String currentTokenBuffer = "\"";
         int index = 1;
         while(true){
             currentTokenBuffer+=currentLine.charAt(index);
@@ -253,14 +257,14 @@ public class Tokenizer {
         }
     }
 
-    private boolean isIdentifier(String identifier) {
-        return identifier.matches(indentifyierPattern);
+    private boolean isIdentifier(String str) {
+        return str.matches(indentifyierPattern);
     }
 
     private Token processIdentifier(String currentLine) {
         String currentTokenBuffer = currentLine.substring(0,1);
         int index = 1;
-        while (isOperator(currentTokenBuffer + currentLine.charAt(index))){
+        while (index < currentLine.length() && isIdentifier(currentTokenBuffer + currentLine.charAt(index)) ){
             currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
             index++;
         }
