@@ -1,0 +1,2 @@
+(Delimiter,\n)
+(Operator,-)(Operator,-)(Delimiter,;)(Delimiter,()(Delimiter,))(Delimiter,{)(Delimiter,})(Delimiter,[)(Delimiter,])(Delimiter,\n)
