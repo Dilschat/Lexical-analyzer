@@ -1,0 +1,46 @@
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+public class NumericalTypeUtils {
+
+    public static boolean isNumberLiteral(String currentTokenBuffer) {
+        return Character.isDigit(currentTokenBuffer.charAt(0));
+    }
+
+    public static Token processNumericLiteral(String previousString, String currentLine, int indx){
+        int index=indx;
+        String currentTokenBuffer = previousString;
+        if(currentTokenBuffer.length()==0) {
+            currentTokenBuffer = Character.toString(currentLine.charAt(0));
+        }
+        if(index<currentLine.length()-1) {
+            index++;
+        }else {
+            index++;
+            return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
+        }
+        currentTokenBuffer+=currentLine.charAt(index);
+        if(NumberUtils.isCreatable(currentTokenBuffer)){
+            return processNumericLiteral(currentTokenBuffer,currentLine, index);
+        }else {
+            index++;
+            currentTokenBuffer+=currentLine.charAt(index);
+            if(NumberUtils.isCreatable(currentTokenBuffer)){
+                return processNumericLiteral(currentTokenBuffer,currentLine,index);
+            }else {
+                index++;
+                currentTokenBuffer+=currentLine.charAt(index);
+                if(NumberUtils.isCreatable(currentTokenBuffer)){
+
+                    return processNumericLiteral(currentTokenBuffer,currentLine, index);
+                }else {
+                    index-=2;
+                    currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
+                    return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
+                }
+
+
+            }
+        }
+    }
+}

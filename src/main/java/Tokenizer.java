@@ -88,10 +88,10 @@ public class Tokenizer {
                 return processOperator(currentLine);
             } else if (isIdentifier(Character.toString(currentLine.charAt(0)))) {
                 return processIdentifier(currentLine);
-            } else if (isNumberLiteral(currentLine)) {
-                return processNumericLiteral("",currentLine,0);
-            } else if (currentLine.charAt(0)=='\'') {
-                return processCharacter(currentLine,0);
+            } else if (NumericalTypeUtils.isNumberLiteral(currentLine)) {
+                return NumericalTypeUtils.processNumericLiteral("",currentLine,0);
+            } else if (CharacterTypeUtils.isCharacter(currentLine)) {
+                return CharacterTypeUtils.processCharacter(currentLine,0);
             } else {
 
                     throw new Exception("Huinyu napisali");
@@ -130,41 +130,7 @@ public class Tokenizer {
     }
 
 
-    private Token processCharacter(String currentLine,int index) throws Exception {
-        String currentTokenBuffer="";
-        if(index+1<currentLine.length()) {
-            index++;
-        }else {
-            throw new Exception("wrong character");
-        }
-        while (!(currentLine.charAt(index)=='\'')){
-            if(index+1>=currentLine.length()){
-                throw new Exception("wrong character");
-            }
-            if(currentLine.charAt(index+1)=='\''){
 
-                currentTokenBuffer+=currentLine.charAt(index);
-                index++;
-                continue;
-            }
-            currentTokenBuffer+=currentLine.charAt(index);
-            index++;
-
-        }
-        if(currentTokenBuffer.length()>1 && currentTokenBuffer.charAt(0)!='\\'){
-            throw new Exception("wrong character");
-        }else {
-            if(Character.isDefined(currentTokenBuffer.charAt(0))){
-                index++;
-                return new Token(currentTokenBuffer,Token.LITERAL_CHARACTER);
-            }
-            else {
-                throw new Exception("wrong character");
-
-            }
-        }
-
-    }
 
     private boolean isMultilineStringLiteral(int index) {
         return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
@@ -212,46 +178,7 @@ public class Tokenizer {
         return new Token(currentTokenBuffer, Token.LITERAL_STRING);
     }
 
-    private boolean isNumberLiteral(String currentTokenBuffer) {
-        return StringUtils.isNumeric(currentTokenBuffer);
-    }
 
-    private Token processNumericLiteral(String previousString, String currentLine, int indx){
-        int index=indx;
-        String currentTokenBuffer = previousString;
-        if(currentTokenBuffer.length()==0) {
-            currentTokenBuffer = Character.toString(currentLine.charAt(0));
-        }
-        if(index<currentLine.length()-1) {
-            index++;
-        }else {
-            index++;
-            return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
-        }
-        currentTokenBuffer+=currentLine.charAt(index);
-        if(NumberUtils.isCreatable(currentTokenBuffer)){
-            return processNumericLiteral(currentTokenBuffer,currentLine, indx);
-        }else {
-            index++;
-            currentTokenBuffer+=currentLine.charAt(index);
-            if(NumberUtils.isCreatable(currentTokenBuffer)){
-                return processNumericLiteral(currentTokenBuffer,currentLine,indx);
-            }else {
-                index++;
-                currentTokenBuffer+=currentLine.charAt(index);
-                if(NumberUtils.isCreatable(currentTokenBuffer)){
-
-                    return processNumericLiteral(currentTokenBuffer,currentLine, indx);
-                }else {
-                    index-=2;
-                    currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
-                    return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
-                }
-
-
-            }
-        }
-    }
 
     private boolean isIdentifier(String identifier) {
         return identifier.matches(indentifyierPattern);
