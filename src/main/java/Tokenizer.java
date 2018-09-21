@@ -220,34 +220,40 @@ public class Tokenizer {
         return new Token(currentTokenBuffer, Token.LITERAL_STRING);
     }
 
-    private boolean isNumberLiteral() {
+    private boolean isNumberLiteral(String currentTokenBuffer) {
         return StringUtils.isNumeric(currentTokenBuffer);
     }
 
-    private Token processNumericLiteral(){
+    private Token processNumericLiteral(String previousString, String currentLine, int indx){
+        int index=indx;
+        String currentTokenBuffer = previousString;
+        if(currentTokenBuffer.length()==0) {
+            currentTokenBuffer = Character.toString(currentLine.charAt(0));
+        }
         if(index<currentLine.length()-1) {
             index++;
         }else {
             index++;
-            return new Token(currentTokenBuffer, Token.LITERAL);
+            return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
         }
         currentTokenBuffer+=currentLine.charAt(index);
         if(NumberUtils.isCreatable(currentTokenBuffer)){
-            return processNumericLiteral();
+            return processNumericLiteral(currentTokenBuffer,currentLine, indx));
         }else {
             index++;
             currentTokenBuffer+=currentLine.charAt(index);
             if(NumberUtils.isCreatable(currentTokenBuffer)){
-                return processNumericLiteral();
+                return processNumericLiteral(currentTokenBuffer,currentLine,indx);
             }else {
                 index++;
                 currentTokenBuffer+=currentLine.charAt(index);
                 if(NumberUtils.isCreatable(currentTokenBuffer)){
-                    return processNumericLiteral();
+
+                    return processNumericLiteral(currentTokenBuffer,currentLine, indx);
                 }else {
                     index-=2;
                     currentTokenBuffer=currentTokenBuffer.substring(0, currentTokenBuffer.length()-3);
-                    return new Token(currentTokenBuffer, Token.LITERAL);
+                    return new Token(currentTokenBuffer, "Numerical " + Token.LITERAL_NUMERIC);
                 }
 
 
