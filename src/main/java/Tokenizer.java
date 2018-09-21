@@ -138,6 +138,8 @@ public class Tokenizer {
                 return DelimiterUtils.processDelimiter(currentLine);
             } else if (StringLiteralUtils.isMultilineStringLiteral(0, currentLine)) {
                 return StringLiteralUtils.processMultilineString(currentLine, scanner);
+            } else if (IdentifierKeywordUtils.isStartOfStrangeIdentifier(currentLine.charAt(0))){
+                return IdentifierKeywordUtils.processStrangeIdentifier(currentLine);
             } else if (StringLiteralUtils.isBeginningStringLiteral(currentLine.charAt(0))){
                 return StringLiteralUtils.processStringLiteral(currentLine);
             } else if (OperatorUtils.isOperator(Character.toString(currentLine.charAt(0)))) {

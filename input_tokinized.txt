@@ -1,4 +1,6 @@
 (Delimiter,\n)
 (Delimiter,\n)
-(Identifier,dd)(Delimiter,\n)
+(Identifier,dd)(Identifier,d)(Identifier,d)(Identifier,d)(Delimiter,.)(Identifier,d)(Delimiter,\n)
+(Identifier,`ddd`)(Identifier,dd)(Identifier,`dd`)(Delimiter,\n)
+(Operator,+)(Identifier,`ds`)(Delimiter,\n)
 (String literal,"fdfdf")(Delimiter,\n)
