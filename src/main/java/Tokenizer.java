@@ -92,8 +92,8 @@ public class Tokenizer {
                 return processIdentifier();
             } else if (isNumberLiteral(currentLine)) {
                 return processNumericLiteral("", currentLine,0);
-            } else if (currentTokenBuffer.equals("'")) {
-                return processCharacter();
+            } else if (currentLine.equals("'")) {
+                return processCharacter(currentLine,0);
             } else {
                 if (index < currentLine.length()) {
                     index++;
@@ -137,8 +137,8 @@ public class Tokenizer {
         return Character.isDefined(currentTokenBuffer.charAt(0));
     }
 
-    private Token processCharacter() throws Exception {
-        currentTokenBuffer="";
+    private Token processCharacter(String currentLine,int index) throws Exception {
+        String currentTokenBuffer="";
         if(index+1<currentLine.length()) {
             index++;
         }else {
@@ -164,7 +164,7 @@ public class Tokenizer {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){
                 index++;
                 obrubatel();
-                return new Token(currentTokenBuffer,Token.LITERAL);
+                return new Token(currentTokenBuffer,Token.LITERAL_CHARACTER);
             }
             else {
                 throw new Exception("wrong character");
