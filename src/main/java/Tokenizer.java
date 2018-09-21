@@ -85,9 +85,8 @@ public class Tokenizer {
             } else if (isMultilineStringLiteral(0)) {
                 return processMultilineString();
             } else if (isBeginningStringLiteral()){
-                index++;
                 return processStringLiteral();
-            } else if (isOperator()) {
+            } else if (isOperator(Character.toString(currentLine.charAt(0)))) {
                 index++;
                 return processOperator();
             } else if (isIdentifier()) {
@@ -117,30 +116,29 @@ public class Tokenizer {
     }
 
     private Token processOperator() {
-        if (index < currentLine.length()){
-            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
-            index++;
-            if (isOperator()) {
-                return processOperator();
+        String currentTokenBuffer = Character.toString(currentLine.charAt(0));
+        int index = 1;
+        if (isOperator(currentLine.substring(0,2))){
+            currentTokenBuffer = currentLine.substring(0,2);
+            if(isOperator(currentLine.substring(0,3))){
+                currentTokenBuffer = currentLine.substring(0,3);
             }
-            index--;
-            currentTokenBuffer = currentTokenBuffer.substring(0, currentTokenBuffer.length()-1);
         }
-        obrubatel();
         return new Token(currentTokenBuffer, Token.OPERATOR);
     }
 
-    private boolean isOperator()  {
-        return operatorsSet.contains(currentTokenBuffer);
+    private boolean isOperator(String operator)  {
+        return operatorsSet.contains(operator);
     }
 
-    private boolean isKeyword() {
-        return keywordsSet.contains(currentTokenBuffer);
+    private boolean isKeyword(String identifier) {
+        return keywordsSet.contains(identifier);
     }
 
     private boolean isCharacterLiteral() {
         return Character.isDefined(currentTokenBuffer.charAt(0));
     }
+
     private Token processCharacter() throws Exception {
         currentTokenBuffer="";
         if(index+1<currentLine.length()) {
@@ -204,7 +202,7 @@ public class Tokenizer {
             }
         }
         currentTokenBuffer +="\"\"\"";
-        return new Token(currentTokenBuffer, Token.LITERAL_STRING);
+        return new Token(currentTokenBuffer, Token.LITERAL_MULTILINE_STRING);
     }
 
     public boolean isBeginningStringLiteral() {
@@ -224,12 +222,13 @@ public class Tokenizer {
             if (index == currentLine.length())
                 throw new Exception("Unclosed string literal: " + currentTokenBuffer);
         }
-        obrubatel();
-        return new Token(currentTokenBuffer, Token.LITERAL);
+        return new Token(currentTokenBuffer, Token.LITERAL_STRING);
     }
+
     private boolean isNumberLiteral() {
         return StringUtils.isNumeric(currentTokenBuffer);
     }
+
     private Token processNumericLiteral(){
         if(index<currentLine.length()-1) {
             index++;
@@ -261,8 +260,8 @@ public class Tokenizer {
         }
     }
 
-    private boolean isIdentifier() {
-        return currentTokenBuffer.matches(indentifyierPattern);
+    private boolean isIdentifier(String identifier) {
+        return identifier.matches(indentifyierPattern);
     }
 
     private Token processIdentifier(){
