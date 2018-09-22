@@ -1,3 +1,6 @@
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,16 +17,20 @@ public class Main {
         System.out.println(s.matches(pattern));
         */
 
-        printTokensFromInputTxt();
+        String[] fileNames = {"input.txt"};
+        FilesTokenizer filesTokenizer = new FilesTokenizer(fileNames);
+        filesTokenizer.tokenizeFiles();
     }
 
     private static void printTokensFromInputTxt() {
         try {
-            Scanner scanner = new Scanner(new FileReader("input.txt"));
-            Tokenizer tokenizer = new Tokenizer(scanner);
+            Tokenizer tokenizer = new Tokenizer("input.txt");
             Token token;
+
             while(tokenizer.hasNext()){
                 token = tokenizer.getNextToken();
+                if(token == null)
+                    break;
                 System.out.println(token.toString());
             }
         } catch (FileNotFoundException e) {

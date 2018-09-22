@@ -1,9 +1,9 @@
 //import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +20,7 @@ public class Tokenizer {
             "to", "trait", "true", "try", "until", "val", "var", "while", "with");
     private static HashSet<String> keywordsSet = new HashSet<String>(keywords);
     private static String indentifyierPattern = "[a-zA-Z_][a-zA-Z0-9_]*";
-    private static String delimiterPattern = "[;|,|.]"; // а как же {} ()
+    private static String delimiterPattern = "[;|,|.]{}(): "; // а как же {} ()
     //TODO add synatic noise
     private static List<String> operators =
             Arrays.asList("+", "-", "*", "/", "%",
@@ -29,8 +29,6 @@ public class Tokenizer {
                     "<<", ">>", "=", "+=", "-=", "*=", "/=",
                     "%=", "<<=", ">>=", "^=", "|=", "&=");
     private static HashSet<String> operatorsSet = new HashSet<String>(operators);
-    private static List<String> literalPattern = Arrays.asList("\"[[\\s|\\S]*\"]"/*string pattern*/,
-            "[0-9]*"/*number pattern*/, "[0-9]*.[0-9]*[[e][-|+][[0-9]*[d]?]]?", "\"\"\"[[\\s|\\S|\n]*]\"\"\"");
 
     private static List<Character> printableEscapeCharacters =
             Arrays.asList('\b', '\t', '\n', '\f', '\r', '\"', '\'', '\\');
@@ -39,142 +37,163 @@ public class Tokenizer {
     //A character with Unicode between 0 and 255 may also be represented by an octal escape,
     // i.e. a backslash '\' followed by a sequence of up to three octal characters.
 
-    private Character currentChar;
-    private String previousCharacters;
+    private String currentLine;
+    private Scanner scanner;
+    private boolean hasNext = true;
 
-    public Tokenizer(Scanner scanner){
-        sourceCode = scanner;
-        scanner.useDelimiter("");
-        readNextChar();
+    public Tokenizer(String fileName) throws FileNotFoundException {
+        scanner = new Scanner(new FileReader(fileName));
+        currentLine="";
     }
 
     public boolean hasNext(){
-        return currentChar != null;
+        return hasNext;
+    }
+
+    private void obrubatel(Token token){
+        currentLine = currentLine.substring(token.getElement().length(), currentLine.length());
     }
 
     //Draft impl. TODO finish according patterns above.
 
     public Token getNextToken() throws Exception {
-        previousCharacters = "";
-        if (isDelimiter(currentChar)){
-            return processDelimiter();
-        } else if(isThisStartOfOperatorOrSyntaxNoise(currentChar)){
-            return processOperator();
-        } else if(isThisStartOfLiteral(currentChar)) {
-            return processLiteral();
-        } else {
-            readNextChar();
-            return new Token(currentChar, "ne to");
+        if (currentLine.length() == 0) {
+            if (! scanner.hasNext()){
+                hasNext = false;
+                return new Token("\\n", Token.DELIMITER);
+            } else {
+                currentLine = scanner.nextLine();
+                return new Token("\\n", Token.DELIMITER);
+            }
         }
-    }
-
-    /**
-     * ( ) [ ] { }
-     * ` ' " . ; ,
-     * @param character
-     * @return
-     */
-    private boolean isDelimiter(Character character) {
-        return "()[]{}`.,".contains(character.toString()); //TODO check if delimiter
-    }
-
-    private Token processDelimiter(){
-        previousCharacters = currentChar.toString();
-        readNextChar();
-        readCharsTillValuableChar();
-        return new Token(previousCharacters, Token.DELIMITER);
-    }
-
-    /**
-     * all operators in scala
-     * + - * / %
-     * == != > < >= <=
-     * && || !
-     * & | ^
-     * ~ << >> >>>
-     * = += -= *= /= %= <<= >>= &= ^= |=
-     * @param currentCHar
-     * @return
-     */
-    //TODO: check for syntax noise or REDO
-    private boolean isThisStartOfOperatorOrSyntaxNoise(Character currentCHar) {
-        return "+-*/%=!><&|^~".contains(currentCHar.toString());
-    }
-
-    /**
-     * all operators in scala
-     * + - * / %
-     * == != > < >= <=
-     * && || !
-     * & | ^
-     * ~ << >> >>>
-     * = += -= *= /= %= <<= >>= &= ^= |=
-     *
-     *
-     * assume this functions is called only when current character is an beginning of the operator
-     * @return
-     * @throws Exception
-     */
-    private Token processOperator(){
-        while(operatorsSet.contains(previousCharacters + currentChar.toString())){
-            previousCharacters = previousCharacters + currentChar;
-            readNextChar();
+        Token token = processToken();
+        obrubatel(token);
+        while (token.getElement().equals(" ")){
+            token = getNextToken();
+            obrubatel(token);
         }
-        readCharsTillValuableChar();
-        return new Token(previousCharacters, Token.OPERATOR);
+        return token;
     }
 
+    //TODO: handle whitespaces
+    private Token processToken() throws Exception {
+        if (currentLine.length() > 0){
+            if(isDelimiter()){
+                return processDelimiter();
+            } else if (isMultilineStringLiteral(0)) {
+                return processMultilineString();
+            } else if (isBeginningStringLiteral(currentLine.charAt(0))){
+                return processStringLiteral(currentLine);
+            } else if (isOperator(Character.toString(currentLine.charAt(0)))) {
+                return processOperator(currentLine);
+            } else if (isIdentifier(Character.toString(currentLine.charAt(0)))) {
+                return processIdentifier(currentLine);
+            } else if (NumericalTypeUtils.isNumberLiteral(currentLine)) {
+                return NumericalTypeUtils.processNumericLiteral("",currentLine,0);
+            } else if (CharacterTypeUtils.isCharacter(currentLine)) {
+                return CharacterTypeUtils.processCharacter(currentLine,0);
+            } else {
 
-    /**
-     * reads characters while current character is not whitespace
-     */
-    private void readCharsTillValuableChar(){
-        while(currentChar!= null && currentChar == ' '){
-            readNextChar();
+                    throw new Exception("Huinyu napisali");
+
+            }
         }
+        return null;
     }
 
-    /**
-     * for shortness of the code
-     */
-    private void readNextChar() {
-        if(sourceCode.hasNext()) {
-            currentChar = sourceCode.next().toCharArray()[0];
-        } else {
-            currentChar = null;
+    private Token processDelimiter() {
+        return new Token(currentLine.charAt(0), Token.DELIMITER);
+    }
+
+    private boolean isDelimiter() {
+        return delimiterPattern.contains(Character.toString(currentLine.charAt(0)));
+    }
+
+    private Token processOperator(String currentLine) {
+        String currentTokenBuffer = Character.toString(currentLine.charAt(0));
+        int index = 1;
+        if (isOperator(currentLine.substring(0,2))){
+            currentTokenBuffer = currentLine.substring(0,2);
+            if(isOperator(currentLine.substring(0,3))){
+                currentTokenBuffer = currentLine.substring(0,3);
+            }
         }
+        return new Token(currentTokenBuffer, Token.OPERATOR);
+    }
+
+    private boolean isOperator(String operator)  {
+        return operatorsSet.contains(operator);
+    }
+
+    private boolean isKeyword(String identifier) {
+        return keywordsSet.contains(identifier);
     }
 
 
-    //TODO: DECOMMENT and do them
 
-    private boolean isThisStartOfLiteral(Character character) {
-        return Character.isDigit(character) || character.equals('"') || character.equals('\'');
+
+    private boolean isMultilineStringLiteral(int index) {
+        return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
+                index+1 < currentLine.length() && currentLine.charAt(index+1) == '\"' &&
+                index+2 < currentLine.length() && currentLine.charAt(index+2) == '\"';
     }
 
-    private Token processLiteral() throws Exception {
-        previousCharacters = currentChar.toString();
-        
+    private Token processMultilineString() throws Exception {
+        int index = 3;
+        String currentTokenBuffer="";
+        while(!isMultilineStringLiteral(index)){
+            if(index == currentLine.length()){
+                currentTokenBuffer+="\n";
+                if (! scanner.hasNext()){
+                    throw new Exception("Unclosed multiline string");
+                } else {
+                    currentLine = scanner.nextLine();
+                    index = 0;
+                }
+            } else {
+                currentTokenBuffer += currentLine.charAt(index);
+                index++;
+            }
+        }
+        return new Token(currentTokenBuffer, Token.LITERAL_MULTILINE_STRING);
     }
 
-    /*
-    Symbol literals
-symbolLiteral  ::=  ‘'’ plainid
-A symbol literal 'x is a shorthand for the expression scala.Symbol("x"). Symbol is a case class, which is defined as follows.
-
-package scala
-final case class Symbol private (name: String) {
-  override def toString: String = "'" + name
-}
-The apply method of Symbol's companion object caches weak references to Symbols, thus ensuring that identical symbol literals are equivalent with respect to reference equality.
-
-Whitespace and Commen
-     */
-
-    /*
-
-    boolean isThisStartOfKeywordOrIdentifier(Character character) {
-
+    public boolean isBeginningStringLiteral(char startLine) {
+        return startLine == '\"';
     }
-*/
+
+    private Token processStringLiteral(String currentLine) throws Exception {
+        String currentTokenBuffer = "";
+        int index = 1;
+        while(true){
+            currentTokenBuffer+=currentLine.charAt(index);
+            index++;
+            if (currentTokenBuffer.charAt(currentTokenBuffer.length()-1) == '\"' &&
+                    currentTokenBuffer.charAt(currentTokenBuffer.length()-2) != '\\') {
+                break;
+            }
+            if (index == currentLine.length())
+                throw new Exception("Unclosed string literal: " + currentTokenBuffer);
+        }
+        return new Token(currentTokenBuffer, Token.LITERAL_STRING);
+    }
+
+
+
+    private boolean isIdentifier(String identifier) {
+        return identifier.matches(indentifyierPattern);
+    }
+
+    private Token processIdentifier(String currentLine) {
+        String currentTokenBuffer = currentLine.substring(0,1);
+        int index = 1;
+        while (isOperator(currentTokenBuffer + currentLine.charAt(index))){
+            currentTokenBuffer = currentTokenBuffer+currentLine.charAt(index);
+            index++;
+        }
+        if (isKeyword(currentTokenBuffer)){
+            return new Token(currentTokenBuffer, Token.KEYWORD);
+        }
+        return new Token(currentTokenBuffer, Token.IDENTIFIER);
+    }
 }
