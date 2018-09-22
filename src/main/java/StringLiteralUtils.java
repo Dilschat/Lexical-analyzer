@@ -5,10 +5,23 @@ import java.util.Scanner;
  */
 public class StringLiteralUtils {
 
-    public static boolean isBeginningStringLiteral(char startLine) {
-        return startLine == '\"';
+    /**
+     * assumption: called after the checking for multiline tokens
+     * checks if beginning of the line is an beginning of the string literal
+     * @param line
+     * @return
+     */
+    public static boolean isBeginningStringLiteral(String line) {
+        return line.charAt(0) == '\"';
     }
 
+    /**
+     * processes string literal from the currentLine
+     * assumption: beginning of the currentLine is an begininng of the string literal
+     * @param currentLine
+     * @return string literal token
+     * @throws Exception in case of unclosed string literal
+     */
     public static Token processStringLiteral(String currentLine) throws Exception {
         String currentTokenBuffer = "\"";
         int index = 1;
@@ -25,16 +38,39 @@ public class StringLiteralUtils {
         return new Token(currentTokenBuffer, Token.LITERAL_STRING);
     }
 
-    public static boolean isMultilineStringLiteral(int index, String currentLine) {
+    /**
+     * checks if at the index position in the string three double quotes are placed
+     * @param index
+     * @param currentLine
+     * @return
+     */
+    private static boolean isThreeDoubleQoutes(int index, String currentLine) {
         return index < currentLine.length() && currentLine.charAt(index) == '\"' &&
                 index+1 < currentLine.length() && currentLine.charAt(index+1) == '\"' &&
                 index+2 < currentLine.length() && currentLine.charAt(index+2) == '\"';
     }
 
+    /**
+     * checks if current line is an beginning of the string literal
+     * @param currentLine
+     * @return
+     */
+    public static boolean isMultilineStringLiteral( String currentLine) {
+        return isThreeDoubleQoutes(0, currentLine);
+    }
+
+    /**
+     * process multiline string
+     * assumption: begging of the currentLine is an multiline string beggining
+     * @param currentLine
+     * @param scanner needs scanner to read next lines from the input file
+     * @return multiline string token
+     * @throws Exception in case of unclosed multiline string
+     */
     public static Token processMultilineString(String currentLine, Scanner scanner) throws Exception {
         int index = 3;
         String currentTokenBuffer="\"\"\"";
-        while(!isMultilineStringLiteral(index, currentLine)){
+        while(!isThreeDoubleQoutes(index, currentLine)){
             if(index == currentLine.length()){
                 currentTokenBuffer+="\n";
                 if (! scanner.hasNext()){
