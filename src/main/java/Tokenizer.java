@@ -134,24 +134,40 @@ public class Tokenizer {
     //TODO: handle whitespaces
     private Token processToken() throws Exception {
         if (currentLine.length() > 0){
-            if(DelimiterUtils.isDelimiter(currentLine.charAt(0))){
-                return DelimiterUtils.processDelimiter(currentLine.charAt(0));
-            } else if (StringLiteralUtils.isMultilineStringLiteral(0, currentLine)) {
-                return StringLiteralUtils.processMultilineString(currentLine, scanner);
-            } else if (IdentifierKeywordUtils.isStartOfStrangeIdentifier(currentLine.charAt(0))){
-                return IdentifierKeywordUtils.processStrangeIdentifier(currentLine);
-            } else if (StringLiteralUtils.isBeginningStringLiteral(currentLine.charAt(0))){
-                return StringLiteralUtils.processStringLiteral(currentLine);
-            } else if (OperatorUtils.isOperator(Character.toString(currentLine.charAt(0)))) {
+            //processing operators
+            if(OperatorUtils.isSyntaxNoiseOperator(currentLine)){
+                return OperatorUtils.processSyntaxNoiseOperator(currentLine);
+            }
+            else if (OperatorUtils.isOperator(Character.toString(currentLine.charAt(0)))) {
                 return OperatorUtils.processOperator(currentLine);
-            } else if (IdentifierKeywordUtils.isIdentifierStart(currentLine.charAt(0))) {
+            }
+            //processing delimiters
+            else if(DelimiterUtils.isDelimiter(currentLine.charAt(0))){
+                return DelimiterUtils.processDelimiter(currentLine.charAt(0));
+            }
+            //processing string literal
+            else if (StringLiteralUtils.isMultilineStringLiteral(0, currentLine)) {
+                return StringLiteralUtils.processMultilineString(currentLine, scanner);
+            }
+            else if (StringLiteralUtils.isBeginningStringLiteral(currentLine.charAt(0))){
+                return StringLiteralUtils.processStringLiteral(currentLine);
+            }
+            //processing identifiers
+            else if (IdentifierKeywordUtils.isStartOfStrangeIdentifier(currentLine.charAt(0))){
+                return IdentifierKeywordUtils.processStrangeIdentifier(currentLine);
+            }
+            else if (IdentifierKeywordUtils.isIdentifierStart(currentLine.charAt(0))) {
                 return IdentifierKeywordUtils.processIdentifier(currentLine);
-            } else if (isNumberLiteral(currentLine)) {
+            }
+            //processing number literals
+            else if (isNumberLiteral(currentLine)) {
                 return processNumericLiteral("",currentLine,0);
-            } else if (currentLine.charAt(0)=='\'') {
+            }
+            else if (currentLine.charAt(0)=='\'') {
                 return processCharacter(currentLine,0);
-            } else {
-                    throw new Exception("Huinyu napisali");
+            }
+            else {
+                    throw new Exception("cann't parse: " + currentLine);
             }
         }
         return null;
