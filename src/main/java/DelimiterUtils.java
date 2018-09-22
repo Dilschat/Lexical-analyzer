@@ -7,7 +7,7 @@ public class DelimiterUtils {
     /**
      * assumption: isDelimiter(c) == true
      * @param c character to process
-     * @return elimiter token
+     * @return delimiter token
      */
     public static Token processDelimiter(char c) {
         return new Token(c, Token.DELIMITER);

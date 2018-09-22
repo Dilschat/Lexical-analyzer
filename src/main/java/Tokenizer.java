@@ -1,7 +1,4 @@
-//import sun.jvm.hotspot.ui.tree.SimpleTreeGroupNode;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.*;
 import java.util.Arrays;
@@ -23,6 +20,7 @@ public class Tokenizer {
 
     /**
      * constructor for the tokenizer
+     *
      * @param fileName - name of the file to parse
      * @throws FileNotFoundException
      */
@@ -37,9 +35,10 @@ public class Tokenizer {
 
     /**
      * tells if there is next token
+     *
      * @return true if there is next token
      */
-    public boolean hasNext(){
+    public boolean hasNext() {
         return hasNext;
     }
 
@@ -48,23 +47,25 @@ public class Tokenizer {
      * where x equals to length of the Tokens element
      * if token is a multiline string literal
      * it deletes only amout of symbols after last newline
+     *
      * @param token
      */
-    private void obrubatel(Token token){
+    private void obrubatel(Token token) {
         int start = token.getElement().length();
-        if (token.getType().equals(Token.LITERAL_MULTILINE_STRING)){
-            start = token.getElement().split("\n").length-1;
+        if (token.getType().equals(Token.LITERAL_MULTILINE_STRING)) {
+            start = token.getElement().split("\n").length - 1;
             start = token.getElement().split("\n")[start].length();
         }
         currentLine = currentLine.substring(start, currentLine.length());
     }
 
-    private void obrubatel(int amount){
+    private void obrubatel(int amount) {
         currentLine = currentLine.substring(amount, currentLine.length());
     }
 
     /**
      * assumption: hasNext() is true
+     *
      * @return next Token from the input file
      * @throws Exception in case of unparsable input
      */
@@ -88,15 +89,16 @@ public class Tokenizer {
     /**
      * deletes whitespaces and comments from the beginning of the currentLine
      * also handles multiline comments (moves scanner in that case)
+     *
      * @return newline token if needed
      * @throws Exception in case of unclosed multiline comments
      */
     private Token processIgnoredCode() throws Exception {
         boolean everyThingIsClear = false;
-        while(!everyThingIsClear) {
+        while (!everyThingIsClear) {
             everyThingIsClear = true;
             //processing whitespaces
-            if (currentLine.length()>0 && currentLine.charAt(0) == ' ') {
+            if (currentLine.length() > 0 && currentLine.charAt(0) == ' ') {
                 obrubatel(1);
                 everyThingIsClear = false;
             }
@@ -115,7 +117,7 @@ public class Tokenizer {
                     && currentLine.length() > 1 && currentLine.charAt(1) == '*') {
                 everyThingIsClear = false;
                 obrubatel(2);
-                while (! (currentLine.length() > 0 && currentLine.charAt(0) == '*'
+                while (!(currentLine.length() > 0 && currentLine.charAt(0) == '*'
                         && currentLine.length() > 1 && currentLine.charAt(1) == '/')) {
                     if (currentLine.length() == 0) {
                         if (scanner.hasNext()) {
@@ -144,15 +146,16 @@ public class Tokenizer {
     /**
      * checks if current string is processed
      * if current line is processed
-     *      it checks if file is empty
-     *      if file is empty
-     *          there is no more token to read, sets hasNext to false
-     *      and then returns newline token
+     * it checks if file is empty
+     * if file is empty
+     * there is no more token to read, sets hasNext to false
+     * and then returns newline token
+     *
      * @return newline token if current line is processed
      */
     private Token checkEndOfString() {
         if (currentLine.length() == 0) {
-            if (! scanner.hasNext()) {
+            if (!scanner.hasNext()) {
                 hasNext = false;
             } else {
                 currentLine = scanner.nextLine();
@@ -165,56 +168,45 @@ public class Tokenizer {
     /**
      * main functions that parses tokens
      * assumption: current string is not empty
+     *
      * @return next token from the string
      * @throws Exception in case of unparsable data
      */
     private Token processToken() throws Exception {
-        if (currentLine.length() > 0){
+        if (currentLine.length() > 0) {
             //processing operators
-            if(OperatorUtils.isSyntaxNoiseOperator(currentLine)){
+            if (OperatorUtils.isSyntaxNoiseOperator(currentLine)) {
                 return OperatorUtils.processSyntaxNoiseOperator(currentLine);
-            }
-            else if (OperatorUtils.isBeginningOperator(currentLine)) {
+            } else if (OperatorUtils.isBeginningOperator(currentLine)) {
                 return OperatorUtils.processOperator(currentLine);
             }
             //processing delimiters
-            else if(DelimiterUtils.isDelimiter(currentLine.charAt(0))){
+            else if (DelimiterUtils.isDelimiter(currentLine.charAt(0))) {
                 return DelimiterUtils.processDelimiter(currentLine.charAt(0));
             }
             //processing string literal
             else if (StringLiteralUtils.isMultilineStringLiteral(currentLine)) {
                 return StringLiteralUtils.processMultilineString(currentLine, scanner);
-            }
-            else if (StringLiteralUtils.isBeginningStringLiteral(currentLine)){
+            } else if (StringLiteralUtils.isBeginningStringLiteral(currentLine)) {
                 return StringLiteralUtils.processStringLiteral(currentLine);
-            }
-            /*
-            =================
-            Dilshat
-            =================
-             */
-            //processing number literals
-            else if (isNumberLiteral(currentLine)) {
-                return processNumericLiteral("",currentLine,0);
-            }
-            else if (currentLine.charAt(0)=='\'') {
-                return processCharacter(currentLine,0);
+            } else if (NumericalTypeUtils.isNumberLiteral(currentLine)) {
+                return NumericalTypeUtils.processNumericLiteral("", currentLine, 0);
+            } else if (CharacterTypeUtils.isCharacter(currentLine)) {
+                return CharacterTypeUtils.processCharacter(currentLine, 0);
 
             }
             //processing identifiers
-            else if (IdentifierKeywordUtils.isStartOfStrangeIdentifier(currentLine.charAt(0))){
+            else if (IdentifierKeywordUtils.isStartOfStrangeIdentifier(currentLine.charAt(0))) {
                 return IdentifierKeywordUtils.processStrangeIdentifier(currentLine);
-            }
-            else if (IdentifierKeywordUtils.isIdentifierStart(currentLine)) {
+            } else if (IdentifierKeywordUtils.isIdentifierStart(currentLine)) {
                 return IdentifierKeywordUtils.processIdentifier(currentLine);
-            }
-            else {
-                    throw new Exception("cann't parse: " + currentLine);
+            } else {
+                throw new Exception("cann't parse: " + currentLine);
             }
         }
         return null;
     }
 
 
-    }
 }
+
