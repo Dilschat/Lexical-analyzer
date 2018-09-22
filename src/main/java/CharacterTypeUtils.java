@@ -41,7 +41,7 @@ public class CharacterTypeUtils {
             index++;
 
         }
-        if(currentTokenBuffer.length()>1 && currentTokenBuffer.charAt(0)!='\\'){
+        if(currentTokenBuffer.length()>1){
             throw new Exception("wrong character");
         }else {
             if(Character.isDefined(currentTokenBuffer.charAt(0))){

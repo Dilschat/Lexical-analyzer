@@ -16,7 +16,6 @@ public class Main {
         s = "1q_asd";
         System.out.println(s.matches(pattern));
         */
-
         String[] fileNames = {"input.txt"};
         FilesTokenizer filesTokenizer = new FilesTokenizer(fileNames);
         filesTokenizer.tokenizeFiles();
