@@ -5,12 +5,12 @@ public class DelimiterUtils {
     private static String delimiterPattern = "[;,.]{}(): ";
 
 
-    public static Token processDelimiter(String currentLine) {
-        return new Token(currentLine.charAt(0), Token.DELIMITER);
+    public static Token processDelimiter(char c) {
+        return new Token(c, Token.DELIMITER);
     }
 
-    public static boolean isDelimiter(String currentLine) {
-        return delimiterPattern.contains(Character.toString(currentLine.charAt(0)));
+    public static boolean isDelimiter(char c) {
+        return delimiterPattern.contains(Character.toString(c));
     }
 
 }

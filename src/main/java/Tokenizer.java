@@ -134,8 +134,8 @@ public class Tokenizer {
     //TODO: handle whitespaces
     private Token processToken() throws Exception {
         if (currentLine.length() > 0){
-            if(DelimiterUtils.isDelimiter(currentLine)){
-                return DelimiterUtils.processDelimiter(currentLine);
+            if(DelimiterUtils.isDelimiter(currentLine.charAt(0))){
+                return DelimiterUtils.processDelimiter(currentLine.charAt(0));
             } else if (StringLiteralUtils.isMultilineStringLiteral(0, currentLine)) {
                 return StringLiteralUtils.processMultilineString(currentLine, scanner);
             } else if (IdentifierKeywordUtils.isStartOfStrangeIdentifier(currentLine.charAt(0))){
@@ -144,7 +144,7 @@ public class Tokenizer {
                 return StringLiteralUtils.processStringLiteral(currentLine);
             } else if (OperatorUtils.isOperator(Character.toString(currentLine.charAt(0)))) {
                 return OperatorUtils.processOperator(currentLine);
-            } else if (IdentifierKeywordUtils.isIdentifier(Character.toString(currentLine.charAt(0)))) {
+            } else if (IdentifierKeywordUtils.isIdentifierStart(currentLine.charAt(0))) {
                 return IdentifierKeywordUtils.processIdentifier(currentLine);
             } else if (isNumberLiteral(currentLine)) {
                 return processNumericLiteral("",currentLine,0);

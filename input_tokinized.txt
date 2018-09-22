@@ -1,6 +1,2 @@
-(Delimiter,\n)
-(Delimiter,\n)
-(Identifier,dd)(Identifier,d)(Identifier,d)(Identifier,d)(Delimiter,.)(Identifier,d)(Delimiter,\n)
-(Identifier,`ddd`)(Identifier,dd)(Identifier,`dd`)(Delimiter,\n)
-(Operator,+)(Identifier,`ds`)(Delimiter,\n)
-(String literal,"fdfdf")(Delimiter,\n)
+(Identifier,maxIndex)(Identifier,p2p)(Identifier,empty_?)(Delimiter,\n)
+(Operator,+)(Identifier,`var`)(Identifier,αρετη)(Identifier,_y)(Identifier,dot_product_*)(Delimiter,\n)

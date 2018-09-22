@@ -38,7 +38,7 @@ public class StringLiteralUtils {
             if(index == currentLine.length()){
                 currentTokenBuffer+="\n";
                 if (! scanner.hasNext()){
-                    throw new Exception("Unclosed multiline string");
+                    throw new Exception("Unclosed multiline string: " + currentTokenBuffer);
                 } else {
                     currentLine = scanner.nextLine();
                     index = 0;
