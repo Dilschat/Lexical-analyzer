@@ -1,8 +1,9 @@
-maxIndex   p2p      empty_?
-    +         `var`       αρετη     _y       dot_product_*
-    ++ == = -- >>> ->
-    """fdfd
-    fdfd
+package pl.japila.scalania.collection
 
-    """
-"ghjkl;" ; {}
+/**
+ * Inspired by http://stackoverflow.com/q/29701182/1305344
+ */
+object P08 {
+  def removeWordsFromSentences(words: Set[String])(sentences: Seq[String]): Seq[String] =
+    sentences.map(_.split("\\s").toSet -- words).flatten
+}

@@ -3,10 +3,23 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 public class NumericalTypeUtils {
 
+    /**
+     * Checks is this line starts as a number
+     * @param line ine readed input for recognizing next token
+     * @return is start of this line can be recognized as number
+     */
     public static boolean isNumberLiteral(String line) {
         return !(line.length()==0) && Character.isDigit(line.charAt(0));
     }
 
+    /**
+     *
+     * @param previousString already processed part of origin line
+     * @param currentLine origin line for recognition
+     * @param indx index of next character that should be recognized in origin line
+     * @return recognized token
+     * @throws Exception if token can't be recognized it throws exception with message "it is not beginning as numeric"
+     */
     public static Token processNumericLiteral(String previousString, String currentLine, int indx) throws Exception {
         while (!isNumberLiteral(currentLine)){
             throw new Exception("is not beginning with numeric");

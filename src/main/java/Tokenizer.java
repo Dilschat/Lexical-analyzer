@@ -191,7 +191,7 @@ public class Tokenizer {
                 return StringLiteralUtils.processStringLiteral(currentLine);
             } else if (NumericalTypeUtils.isNumberLiteral(currentLine)) {
                 return NumericalTypeUtils.processNumericLiteral("", currentLine, 0);
-            } else if (CharacterTypeUtils.isCharacter(currentLine)) {
+            } else if (CharacterTypeUtils.isStartCharacter(currentLine)) {
                 return CharacterTypeUtils.processCharacter(currentLine, 0);
 
             }

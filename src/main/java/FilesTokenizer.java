@@ -30,6 +30,7 @@ public class FilesTokenizer {
                             writer.print(token.toString());
                             if (token.getElement().equals("\\n")) {
                                 writer.println();
+                                writer.flush();
                             }
                         } catch (Exception e) {
                             System.out.println("Error while parsing " + fileNames[i] + ":\n" + e.getMessage());
@@ -45,5 +46,6 @@ public class FilesTokenizer {
                 System.out.println("Cannot find file " + fileNames[i]);
             }
         }
+
     }
 }

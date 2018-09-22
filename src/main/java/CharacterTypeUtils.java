@@ -1,6 +1,11 @@
 public class CharacterTypeUtils {
 
-    public static boolean isCharacter(String line){
+    /**
+     * Checks is this line starts as character starts
+     * @param line readed input for recognizing next token
+     * @return is start of this line can be recognized as character
+     */
+    public static boolean isStartCharacter(String line){
         if(line.length()!=0) {
             return line.charAt(0) == '\'';
         }else {
@@ -8,7 +13,13 @@ public class CharacterTypeUtils {
         }
     }
 
-
+    /**
+     *
+     * @param currentLine readed input for recognizing next token
+     * @param index index of vharacter in given string that should be seen next
+     * @return recognized token
+     * @throws Exception if token can't be recognized it throws exception with message "Wrong character"
+     */
     public static Token processCharacter(String currentLine,int index) throws Exception {
         String currentTokenBuffer="";
         if(index+1<currentLine.length()) {

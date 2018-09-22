@@ -8,12 +8,12 @@ class CharacterTypeUtilsTest {
 
     @Test
     void isCharacter() {
-        assertTrue(CharacterTypeUtils.isCharacter("'"));
-        assertTrue(CharacterTypeUtils.isCharacter("'sfdfsdf"));
-        assertTrue(CharacterTypeUtils.isCharacter("'fdsf'"));
-        assertFalse(CharacterTypeUtils.isCharacter(""));
-        assertFalse(CharacterTypeUtils.isCharacter("dsfdsfsdfsd"));
-        assertFalse(CharacterTypeUtils.isCharacter("fdsfsd'"));
+        assertTrue(CharacterTypeUtils.isStartCharacter("'"));
+        assertTrue(CharacterTypeUtils.isStartCharacter("'sfdfsdf"));
+        assertTrue(CharacterTypeUtils.isStartCharacter("'fdsf'"));
+        assertFalse(CharacterTypeUtils.isStartCharacter(""));
+        assertFalse(CharacterTypeUtils.isStartCharacter("dsfdsfsdfsd"));
+        assertFalse(CharacterTypeUtils.isStartCharacter("fdsfsd'"));
     }
 
     @Test
