@@ -34,6 +34,7 @@ public class Token {
     public static final String KEYWORD = "Keyword";
     public static final String IDENTIFIER = "Identifier";
     public static final String OPERATOR = "Operator";
+    public static final String OPERATOR_NOISE = "Operator syntax noise";
     //public static final String LITERAL = "Literal";
     public static final String LITERAL_CHARACTER = "Character literal";
     public static final String LITERAL_STRING = "String literal";

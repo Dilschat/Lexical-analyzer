@@ -1,0 +1,8 @@
+(Identifier,maxIndex)(Identifier,p2p)(Identifier,empty_?)(Delimiter,\n)
+(Operator,+)(Identifier,`var`)(Identifier,αρετη)(Identifier,_y)(Identifier,dot_product_*)(Delimiter,\n)
+(Operator,+)(Operator,+)(Operator,==)(Operator,=)(Operator,-)(Operator,-)(Operator,>>>)(Operator syntax noise,->)(Delimiter,\n)
+(Multiline string literal,"""fdfd
+    fdfd
+
+    """)(Delimiter,\n)
+(String literal,"ghjkl;")(Delimiter,;)(Delimiter,{)(Delimiter,})(Delimiter,\n)
