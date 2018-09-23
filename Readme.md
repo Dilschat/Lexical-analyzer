@@ -5,22 +5,36 @@ We choose Java language for implementation.
 ### Our notation for Tokens
 Types of Tokens:  
   * **Delimiters** \
-   [;|,|.]{}(): 
-  * **Operators(including syntax noise)** \
+   [;,.]{}():
+  * **Operators (with syntax noise operators)** \
   "+", "-", "*", "/", "%",
-                      "==", "<=", ">=", "!=", ">", "<", "!",
-                      "||", "&&", "&", "|", "~", "^", ">>>",
-                      "<<", ">>", "=", "+=", "-=", "*=", "/=",
-                      "%=", "<<=", ">>=", "^=", "|=", "&="
+      "==", "<=", ">=", "!=", ">", "<", "!",
+      "||", "&&", "&", "|", "~", "^", ">>>",
+       <<", ">>", "=", "+=", "-=", "*=", "/=",
+       "%=", "<<=", ">>=", "^=", "|=", "&="
+       ":+", "::", "+:", "->", "<-", "=>", "<%"
   * **KeyWords** \
-  case", "catch", "class",
-              "def", "do", "else", "extends", "false", "final", "for", "if",
-              "match", "new", "null", "print", "printf", "println", "throw",
-              "to", "trait", "true", "try", "until", "val", "var", "while", "with"
+  "case", "catch", "class",
+       "def", "do", "else", "extends", "false", "final", "if",
+       "print", "printf", "println",
+       "to", "true", "try", "until", "var", "while", "with",
+       "abstract", "finally", "import", "null", "protected", "throw",
+       "val", "case", "for", "lazy", "object", "return", "trait",
+       "catch", "forSome", "macro", "override",
+       "sealed", "class", "match", "package",
+       "super", "implicit", "new", "private",
+       "this", "type", "yield"
   * **Identifiers**
+        Identifier can start with a letter which can be followed by
+  an arbitrary sequence of letters and digits.
+  This may be followed by underscore ‘_‘ characters
+  and another string composed of either letters and digits or of operator characters.
+
+  The ‘$’ character is reserved for compiler-synthesized identifiers.
+  User programs should not define identifiers which contain ‘$’ characters.
   * **Literals**
-    - Line
-    - Multiline
+    - Line string
+    - Multiline string
     - Numeric
     - Character
     
@@ -28,7 +42,7 @@ Types of Tokens:
   
   This file contains tokens in format: __(Type of token, Body of token)__ \
   For example: \
-  >>> (String literal,"string") \
+  >>> (String literal,"string")(Delimiter,\n) \
   >>> (Numeric literal, 123)
   
  ### How to run it
