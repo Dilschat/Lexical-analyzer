@@ -1,7 +1,0 @@
-(Keyword,package)(Identifier,pl)(Delimiter,.)(Identifier,japila)(Delimiter,.)(Identifier,scalania)(Delimiter,.)(Identifier,collection)(Delimiter,\n)
-(Delimiter,\n)
-(Delimiter,\n)
-(Keyword,object)(Identifier,P08)(Delimiter,{)(Delimiter,\n)
-(Keyword,def)(Identifier,removeWordsFromSentences)(Delimiter,()(Identifier,words)(Delimiter,:)(Identifier,Set)(Delimiter,[)(Identifier,String)(Delimiter,])(Delimiter,))(Delimiter,()(Identifier,sentences)(Delimiter,:)(Identifier,Seq)(Delimiter,[)(Identifier,String)(Delimiter,])(Delimiter,))(Delimiter,:)(Identifier,Seq)(Delimiter,[)(Identifier,String)(Delimiter,])(Operator,=)(Delimiter,\n)
-(Identifier,sentences)(Delimiter,.)(Identifier,map)(Delimiter,()(Identifier,_)(Delimiter,.)(Identifier,split)(Delimiter,()(String literal,"\\s")(Delimiter,))(Delimiter,.)(Identifier,toSet)(Operator,-)(Operator,-)(Identifier,words)(Delimiter,))(Delimiter,.)(Identifier,flatten)(Delimiter,\n)
-(Delimiter,})(Delimiter,\n)
