@@ -29,7 +29,7 @@ Types of Tokens:
   an arbitrary sequence of letters and digits.
   This may be followed by underscore ‘_‘ characters
   and another string composed of either letters and digits or of operator characters.
-  
+
   The ‘$’ character is reserved for compiler-synthesized identifiers.
   User programs should not define identifiers which contain ‘$’ characters.
   * **Literals**
