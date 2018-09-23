@@ -47,9 +47,9 @@ Types of Tokens:
   
  ### How to run it
   1. For building this project you need to install [Maven](https://maven.apache.org/). 
-  2. For running it with sample code in input.txt just run build_and_run.sh 
-  3. For running it using terminal use: `java -jar lexical-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar [list of resources]` \
-  For example: `java -jar lexical-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar in.txt`
+  2. For running it with sample code in in.txt just run **build_and_run.sh** 
+  3. For running it using terminal run **build.sh** then use: `java -jar lexical-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar [list of resources]` \
+  For example: ```java -jar lexical-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar in.txt```
   4. Standalone function **getNextToken()** presented in class Tokenizer. and returns string that presents token in format described above.
   
  
